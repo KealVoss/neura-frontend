@@ -45,7 +45,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const data = await apiRequest<SettingsData>('/settings')
+        const data = await apiRequest<SettingsData>('/settings/')
         setSettings(data)
       } catch (err: any) {
         setError(err.message || 'Failed to load settings')
@@ -172,7 +172,7 @@ export default function SettingsPage() {
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
               ACCOUNT
             </h2>
-            <div className="rounded-md border border-border-secondary bg-white p-4">
+            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <label htmlFor="email" className="text-sm font-medium text-text-primary-900">
                   Email
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                     type="email"
                     value={settings?.email || user.email || ''}
                     readOnly
-                    className="w-full rounded-md border border-border-secondary bg-bg-primary pl-9 pr-3 py-2 text-sm text-text-quaternary-500"
+                    className="w-full rounded-md border border-border-secondary bg-bg-primary pl-9 pr-3 py-2 text-sm text-text-primary-900"
                   />
                 </div>
               </div>
@@ -211,7 +211,7 @@ export default function SettingsPage() {
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
               INTEGRATION
             </h2>
-            <div className="rounded-md border border-border-secondary bg-white p-4">
+            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
               {/* Top Section: Xero Logo, Status, and Actions */}
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                     xero
                   </div>
                   {xeroIntegration?.is_connected && (
-                    <div className="flex items-center gap-1.5 rounded-full border border-border-secondary bg-white px-2 py-0.5">
+                    <div className="flex items-center gap-1.5 rounded-full border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-2 py-0.5">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#079455]"></span>
                       <span className="text-xs text-text-primary-900">Connected</span>
                     </div>
@@ -261,7 +261,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleDisconnect}
                         disabled={connecting || disconnecting}
-                        className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-white px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {disconnecting && (
                           <svg
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handleReconnect}
                       disabled={connecting}
-                      className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-white px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {connecting && (
                         <svg
@@ -342,7 +342,7 @@ export default function SettingsPage() {
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
               SUPPORT
             </h2>
-            <div className="rounded-md border border-border-secondary bg-white p-4">
+            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <span className="text-sm font-medium text-text-primary-900">Help & support</span>
                 <a
