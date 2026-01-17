@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { apiRequest } from '@/lib/api/client'
+import XeroConnectModal from '@/components/XeroConnectModal'
 
 interface CashRunwayMetrics {
   current_cash: number
@@ -59,6 +60,21 @@ interface InsightsResponse {
   calculated_at: string | null
 }
 
+interface XeroIntegration {
+  is_connected: boolean
+  status: string
+  connected_at: string | null
+  last_synced_at: string | null
+  needs_reconnect: boolean
+}
+
+interface SettingsData {
+  email: string
+  xero_integration: XeroIntegration
+  last_sync_time: string | null
+  support_link: string | null
+}
+
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
@@ -68,12 +84,24 @@ export default function DashboardPage() {
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
   const [dataQuality, setDataQuality] = useState<'Good' | 'Mixed' | 'Low'>('Good')
   const [generating, setGenerating] = useState(false)
+  const [settings, setSettings] = useState<SettingsData | null>(null)
+  const [showXeroModal, setShowXeroModal] = useState(false)
 
   useEffect(() => {
     if (user) {
       fetchDashboardData()
+      fetchSettings()
     }
   }, [user])
+
+  const fetchSettings = async () => {
+    try {
+      const data = await apiRequest<SettingsData>('/settings/')
+      setSettings(data)
+    } catch (err: any) {
+      // Silently fail - settings not critical for dashboard
+    }
+  }
 
   // Calculate Business Health Score (0-100)
   const calculateHealthScore = (): number => {
@@ -169,6 +197,13 @@ export default function DashboardPage() {
   }
 
   const handleGenerateInsights = async () => {
+    // Check if Xero is connected first
+    const xeroConnected = settings?.xero_integration?.is_connected
+    if (!xeroConnected) {
+      setShowXeroModal(true)
+      return
+    }
+
     try {
       setGenerating(true)
       setError(null)
@@ -178,7 +213,7 @@ export default function DashboardPage() {
       // Poll for completion
       const pollInterval = setInterval(async () => {
         try {
-          const response = await apiRequest<InsightsResponse>('/api/insights')
+          const response = await apiRequest<InsightsResponse>('/api/insights/')
           if (response.insights.length > 0) {
             setData(response)
             
@@ -210,7 +245,7 @@ export default function DashboardPage() {
         setGenerating(false)
         // Refresh data one more time
         try {
-          const response = await apiRequest<InsightsResponse>('/api/insights')
+          const response = await apiRequest<InsightsResponse>('/api/insights/')
           setData(response)
           
           // Update data quality
@@ -662,19 +697,27 @@ export default function DashboardPage() {
         )}
 
         {/* Footer */}
-        <div className="mt-12 flex items-center justify-center gap-2 text-sm text-text-quaternary-500">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#079455]"></span>
-          <span className="text-[#079455]">Connected to Xero</span>
-          <span className="text-[#079455]">•</span>
-          <span className="text-text-quaternary-500">Read-only</span>
-          {data?.calculated_at && (
-            <>
-              <span className="text-[#079455]">•</span>
-              <span className="text-text-quaternary-500">Synced {formatDate(data.calculated_at)}</span>
-            </>
-          )}
-        </div>
+        {settings?.xero_integration?.is_connected && (
+          <div className="mt-12 flex items-center justify-center gap-2 text-sm text-text-quaternary-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#079455]"></span>
+            <span className="text-[#079455]">Connected to Xero</span>
+            <span className="text-[#079455]">•</span>
+            <span className="text-text-quaternary-500">Read-only</span>
+            {data?.calculated_at && (
+              <>
+                <span className="text-[#079455]">•</span>
+                <span className="text-text-quaternary-500">Synced {formatDate(data.calculated_at)}</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Xero Connect Modal */}
+      <XeroConnectModal
+        isOpen={showXeroModal}
+        onClose={() => setShowXeroModal(false)}
+      />
     </div>
   )
 }
