@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { apiRequest } from '@/lib/api/client'
+import { useSettingsStore } from '@/stores/settingsStore'
+import { SettingsSkeleton } from '@/components/SettingsSkeleton'
 
 interface XeroIntegration {
   is_connected: boolean
@@ -25,8 +27,7 @@ export default function SettingsPage() {
   const { user, signOut } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [settings, setSettings] = useState<SettingsData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { settings, isLoading, error: storeError, fetchSettings, updateSettings } = useSettingsStore()
   const [error, setError] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
@@ -43,21 +44,17 @@ export default function SettingsPage() {
   }, [searchParams, router])
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const data = await apiRequest<SettingsData>('/settings/')
-        setSettings(data)
-      } catch (err: any) {
-        setError(err.message || 'Failed to load settings')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     if (user) {
-      fetchSettings()
+      fetchSettings() // Use store's fetchSettings
     }
-  }, [user])
+  }, [user, fetchSettings])
+
+  // Combine store error with local error
+  useEffect(() => {
+    if (storeError) {
+      setError(storeError)
+    }
+  }, [storeError])
 
   const handleDisconnect = async () => {
     try {
@@ -66,9 +63,8 @@ export default function SettingsPage() {
       await apiRequest('/integrations/xero/disconnect', {
         method: 'POST',
       })
-      // Refresh settings after disconnect
-      const data = await apiRequest<SettingsData>('/settings')
-      setSettings(data)
+      // Refresh settings after disconnect using store
+      await fetchSettings()
     } catch (err: any) {
       setError(err.message || 'Failed to disconnect Xero')
     } finally {
@@ -114,12 +110,8 @@ export default function SettingsPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-bg-primary">
-        <p className="text-md text-text-secondary-700">Loading...</p>
-      </div>
-    )
+  if (isLoading) {
+    return <SettingsSkeleton />
   }
 
   if (!user) {

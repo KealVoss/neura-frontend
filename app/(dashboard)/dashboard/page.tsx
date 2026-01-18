@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { apiRequest } from '@/lib/api/client'
+import { useSettingsStore } from '@/stores/settingsStore'
 import XeroConnectModal from '@/components/XeroConnectModal'
+import InsightGenerationModal from '@/components/InsightGenerationModal'
+import { DashboardSkeleton } from '@/components/DashboardSkeleton'
 
 interface CashRunwayMetrics {
   current_cash: number
@@ -83,25 +86,18 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
   const [dataQuality, setDataQuality] = useState<'Good' | 'Mixed' | 'Low'>('Good')
-  const [generating, setGenerating] = useState(false)
-  const [settings, setSettings] = useState<SettingsData | null>(null)
   const [showXeroModal, setShowXeroModal] = useState(false)
+  const [showInsightModal, setShowInsightModal] = useState(false)
+  
+  // Use Zustand store for settings
+  const { settings, fetchSettings, getXeroConnected } = useSettingsStore()
 
   useEffect(() => {
     if (user) {
       fetchDashboardData()
-      fetchSettings()
+      fetchSettings() // Fetch from store
     }
-  }, [user])
-
-  const fetchSettings = async () => {
-    try {
-      const data = await apiRequest<SettingsData>('/settings/')
-      setSettings(data)
-    } catch (err: any) {
-      // Silently fail - settings not critical for dashboard
-    }
-  }
+  }, [user, fetchSettings])
 
   // Calculate Business Health Score (0-100)
   const calculateHealthScore = (): number => {
@@ -174,7 +170,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ is_marked_done: true }),
       })
       // Refresh data
-      const response = await apiRequest<InsightsResponse>('/api/insights')
+      const response = await apiRequest<InsightsResponse>('/api/insights/')
       setData(response)
       setExpandedCardId(null)
     } catch (err: any) {
@@ -189,7 +185,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ is_acknowledged: true }),
       })
       // Refresh data
-      const response = await apiRequest<InsightsResponse>('/api/insights')
+      const response = await apiRequest<InsightsResponse>('/api/insights/')
       setData(response)
     } catch (err: any) {
       setError(err.message || 'Failed to acknowledge insight')
@@ -197,83 +193,45 @@ export default function DashboardPage() {
   }
 
   const handleGenerateInsights = async () => {
-    // Check if Xero is connected first
-    const xeroConnected = settings?.xero_integration?.is_connected
-    if (!xeroConnected) {
-      setShowXeroModal(true)
-      return
-    }
-
     try {
-      setGenerating(true)
       setError(null)
+      
+      // Ensure settings are loaded
+      if (!settings) {
+        await fetchSettings()
+      }
+      
+      // Check Xero connection using store
+      const xeroConnected = getXeroConnected()
+      
+      if (!xeroConnected) {
+        setShowXeroModal(true)
+        return
+      }
+
+      // Open modal IMMEDIATELY (optimistic UI)
+      setShowInsightModal(true)
+      
+      // Then trigger the backend process
       await apiRequest('/api/insights/trigger', {
         method: 'POST',
       })
-      // Poll for completion
-      const pollInterval = setInterval(async () => {
-        try {
-          const response = await apiRequest<InsightsResponse>('/api/insights/')
-          if (response.insights.length > 0) {
-            setData(response)
-            
-            // Update data quality
-            const hasLowConfidence = response.cash_runway?.confidence_level === 'Low' || 
-                                     response.cash_pressure?.confidence === 'low'
-            const hasMediumConfidence = response.cash_runway?.confidence_level === 'Medium' || 
-                                        response.cash_pressure?.confidence === 'medium'
-            
-            if (hasLowConfidence) {
-              setDataQuality('Low')
-            } else if (hasMediumConfidence) {
-              setDataQuality('Mixed')
-            } else {
-              setDataQuality('Good')
-            }
-            
-            setGenerating(false)
-            clearInterval(pollInterval)
-          }
-        } catch (err) {
-          // Continue polling
-        }
-      }, 2000)
-      
-      // Stop polling after 60 seconds
-      setTimeout(async () => {
-        clearInterval(pollInterval)
-        setGenerating(false)
-        // Refresh data one more time
-        try {
-          const response = await apiRequest<InsightsResponse>('/api/insights/')
-          setData(response)
-          
-          // Update data quality
-          const hasLowConfidence = response.cash_runway?.confidence_level === 'Low' || 
-                                   response.cash_pressure?.confidence === 'low'
-          const hasMediumConfidence = response.cash_runway?.confidence_level === 'Medium' || 
-                                      response.cash_pressure?.confidence === 'medium'
-          
-          if (hasLowConfidence) {
-            setDataQuality('Low')
-          } else if (hasMediumConfidence) {
-            setDataQuality('Mixed')
-          } else {
-            setDataQuality('Good')
-          }
-        } catch (err) {
-          // Ignore errors on final refresh
-        }
-      }, 60000)
     } catch (err: any) {
       setError(err.message || 'Failed to generate insights')
-      setGenerating(false)
+      // Close modal on error
+      setShowInsightModal(false)
     }
+  }
+
+  const handleInsightGenerationComplete = async () => {
+    setShowInsightModal(false)
+    // Refresh dashboard data
+    await fetchDashboardData()
   }
 
   const fetchDashboardData = async () => {
     try {
-      const response = await apiRequest<InsightsResponse>('/api/insights')
+      const response = await apiRequest<InsightsResponse>('/api/insights/')
       setData(response)
       
       // Determine data quality based on confidence levels
@@ -297,11 +255,7 @@ export default function DashboardPage() {
   }
 
   if (authLoading || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-bg-primary">
-        <p className="text-md text-text-secondary-700">Loading...</p>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   if (!user) {
@@ -456,20 +410,10 @@ export default function DashboardPage() {
               </p>
               <button
                 onClick={handleGenerateInsights}
-                disabled={generating}
+                disabled={showInsightModal}
                 className="rounded-md bg-bg-brand-solid px-6 py-2.5 text-sm font-semibold text-text-white transition-colors hover:bg-fg-brand-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {generating ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Generating...
-                  </span>
-                ) : (
-                  'Generate insights'
-                )}
+                Generate insights
               </button>
             </div>
           </div>
@@ -717,6 +661,13 @@ export default function DashboardPage() {
       <XeroConnectModal
         isOpen={showXeroModal}
         onClose={() => setShowXeroModal(false)}
+      />
+
+      {/* Insight Generation Modal */}
+      <InsightGenerationModal
+        isOpen={showInsightModal}
+        onClose={() => setShowInsightModal(false)}
+        onComplete={handleInsightGenerationComplete}
       />
     </div>
   )
