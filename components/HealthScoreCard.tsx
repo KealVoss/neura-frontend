@@ -166,14 +166,16 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
     )
   }
 
-  const { scorecard, category_scores, drivers, data_quality } = data
-  const grade = gradeConfig[scorecard.grade]
-  const confidence = confidenceConfig[scorecard.confidence]
+  const { scorecard, category_scores = {}, drivers, data_quality } = data
+  const grade = gradeConfig[scorecard?.grade] ?? gradeConfig.D
+  const confidence = confidenceConfig[scorecard?.confidence] ?? confidenceConfig.low
 
   // Extract key metrics for the 3-box display (Cash, Revenue, Expenses from categories)
-  const cashScore = category_scores.A // Cash & Runway
-  const profitabilityScore = category_scores.B // Profitability (Revenue indicator)
-  const liquidityScore = category_scores.D // Working Capital (Expenses indicator)
+  // Default values handle case when health score hasn't been calculated yet
+  const defaultScore = { points_awarded: 0, max_points: 1 }
+  const cashScore = category_scores.A ?? defaultScore
+  const profitabilityScore = category_scores.B ?? defaultScore
+  const liquidityScore = category_scores.D ?? defaultScore
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
