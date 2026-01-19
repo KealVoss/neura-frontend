@@ -58,32 +58,54 @@ export default function OverviewPage() {
     fetchHealthScore 
   } = useHealthScoreStore()
 
+  // Fetch data only once when user is available
+  // Use user.id as dependency (stable string) instead of user object (new reference each time)
+  const userId = user?.id
   useEffect(() => {
-    if (user) {
+    if (userId) {
       // Fetch from stores (all use cache unless stale or page refresh)
       fetchOverview()
       fetchSettings()
       fetchHealthScore()
     }
-  }, [user, fetchOverview, fetchSettings, fetchHealthScore])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]) // Only re-run when user ID changes, not on every user object update
 
-  // Update data quality when data changes
+  // Update data quality when data or healthScore changes
+  // Aggregates confidence signals from all sources
   useEffect(() => {
-    if (data) {
-      const hasLowConfidence = data.cash_runway?.confidence_level === 'Low' || 
-                               data.cash_pressure?.confidence === 'low'
-      const hasMediumConfidence = data.cash_runway?.confidence_level === 'Medium' || 
-                                  data.cash_pressure?.confidence === 'medium'
-      
-      if (hasLowConfidence) {
-        setDataQuality('Low')
-      } else if (hasMediumConfidence) {
-        setDataQuality('Mixed')
-      } else {
-        setDataQuality('Good')
-      }
+    // Collect all confidence values (normalize to lowercase)
+    const confidenceSignals: string[] = []
+    
+    // From insights data
+    if (data?.cash_runway?.confidence_level) {
+      confidenceSignals.push(data.cash_runway.confidence_level.toLowerCase())
     }
-  }, [data])
+    if (data?.cash_pressure?.confidence) {
+      confidenceSignals.push(data.cash_pressure.confidence.toLowerCase())
+    }
+    
+    // From health score (important - this often shows low confidence)
+    if (healthScore?.scorecard?.confidence) {
+      confidenceSignals.push(healthScore.scorecard.confidence.toLowerCase())
+    }
+    
+    // Check for data quality warnings in health score
+    const hasDataWarnings = (healthScore?.data_quality?.warnings?.length ?? 0) > 0
+    
+    // Determine overall quality - worst signal wins
+    const hasLowConfidence = confidenceSignals.includes('low') || hasDataWarnings
+    const hasMediumConfidence = confidenceSignals.includes('medium')
+    
+    if (hasLowConfidence) {
+      setDataQuality('Low')
+    } else if (hasMediumConfidence) {
+      setDataQuality('Mixed')
+    } else if (confidenceSignals.length > 0) {
+      setDataQuality('Good')
+    }
+    // If no signals yet, keep default 'Good'
+  }, [data, healthScore])
 
   // Memoize filtered insights - must be before any early returns
   const watchInsights = useMemo(() => 
