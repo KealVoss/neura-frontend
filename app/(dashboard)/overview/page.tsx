@@ -6,12 +6,14 @@ import { useToast } from '@/context/ToastContext'
 import { apiRequest } from '@/lib/api/client'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { useOverviewStore, OverviewData, Insight } from '@/stores/overviewStore'
+import { useHealthScoreStore } from '@/stores/healthScoreStore'
 import XeroConnectModal from '@/components/XeroConnectModal'
 import InsightGenerationModal from '@/components/InsightGenerationModal'
 import InsightFeedbackModal from '@/components/InsightFeedbackModal'
 import { DashboardSkeleton } from '@/components/DashboardSkeleton'
 import WatchCard from '@/components/WatchCard'
 import OKCard from '@/components/OKCard'
+import HealthScoreCard from '@/components/HealthScoreCard'
 import { formatDate } from '@/lib/utils/formatDate'
 
 // Types are imported from overviewStore
@@ -47,17 +49,23 @@ export default function OverviewPage() {
   })
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null)
   
-  // Use Zustand stores
+  // Use Zustand stores (all have built-in caching and request deduplication)
   const { settings, fetchSettings, getXeroConnected } = useSettingsStore()
   const { data, isLoading, error, fetchOverview, updateOverview } = useOverviewStore()
+  const { 
+    data: healthScore, 
+    isLoading: healthScoreLoading, 
+    fetchHealthScore 
+  } = useHealthScoreStore()
 
   useEffect(() => {
     if (user) {
-      // Fetch from store (uses cache unless page refresh)
+      // Fetch from stores (all use cache unless stale or page refresh)
       fetchOverview()
       fetchSettings()
+      fetchHealthScore()
     }
-  }, [user, fetchOverview, fetchSettings])
+  }, [user, fetchOverview, fetchSettings, fetchHealthScore])
 
   // Update data quality when data changes
   useEffect(() => {
@@ -356,6 +364,15 @@ export default function OverviewPage() {
         {/* Main Content */}
         {!hasNoInsights && (
         <div className="space-y-8">
+          {/* Business Health Score */}
+          <section>
+            <HealthScoreCard
+              data={healthScore}
+              isLoading={healthScoreLoading}
+              onRefresh={() => fetchHealthScore(true)}
+            />
+          </section>
+
           {/* What needs your attention */}
           {watchInsights.length > 0 && (
             <section>
