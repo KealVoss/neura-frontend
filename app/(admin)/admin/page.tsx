@@ -80,8 +80,10 @@ function OrganizationRow({ org }: { org: OrganizationSummary }) {
   )
 }
 
-// Feedback row
+// Feedback row with expandable details
 function FeedbackRow({ feedback }: { feedback: FeedbackItem }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  
   const formattedDate = new Date(feedback.created_at).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -91,35 +93,121 @@ function FeedbackRow({ feedback }: { feedback: FeedbackItem }) {
   })
 
   return (
-    <tr className="border-b border-border-secondary hover:bg-bg-secondary transition-colors">
-      <td className="py-3 px-4">
-        <div>
-          <p className="text-sm font-medium text-text-primary-900 truncate max-w-[300px]" title={feedback.insight_title}>
-            {feedback.insight_title}
-          </p>
-          <p className="text-xs text-text-quaternary-500">{feedback.insight_type}</p>
-        </div>
-      </td>
-      <td className="py-3 px-4">
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-          feedback.is_helpful 
-            ? 'bg-bg-success-secondary text-icon-success' 
-            : 'bg-bg-error-secondary text-icon-error'
-        }`}>
-          {feedback.is_helpful ? 'Helpful' : 'Not Helpful'}
-        </span>
-      </td>
-      <td className="py-3 px-4">
-        {feedback.comment ? (
-          <p className="text-sm text-text-secondary-700 truncate max-w-[250px]" title={feedback.comment}>
-            {feedback.comment}
-          </p>
-        ) : (
-          <span className="text-sm text-text-quaternary-500">-</span>
-        )}
-      </td>
-      <td className="py-3 px-4 text-sm text-text-quaternary-500">{formattedDate}</td>
-    </tr>
+    <>
+      <tr 
+        className="border-b border-border-secondary hover:bg-bg-secondary transition-colors cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <td className="py-3 px-4">
+          <div className="flex items-center gap-2">
+            {/* Expand/collapse indicator */}
+            <svg 
+              className={`h-4 w-4 text-text-quaternary-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-text-primary-900 truncate max-w-[280px]">
+                {feedback.insight_title}
+              </p>
+              <p className="text-xs text-text-quaternary-500">{feedback.insight_type}</p>
+            </div>
+          </div>
+        </td>
+        <td className="py-3 px-4">
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium ${
+            feedback.is_helpful 
+              ? 'bg-bg-success-secondary text-icon-success' 
+              : 'bg-bg-error-secondary text-icon-error'
+          }`}>
+            {feedback.is_helpful ? (
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+              </svg>
+            ) : (
+              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
+              </svg>
+            )}
+            {feedback.is_helpful ? 'Helpful' : 'Not Helpful'}
+          </span>
+        </td>
+        <td className="py-3 px-4">
+          {feedback.comment ? (
+            <p className="text-sm text-text-secondary-700 truncate max-w-[220px]">
+              {feedback.comment}
+            </p>
+          ) : (
+            <span className="text-sm text-text-quaternary-500 italic">No comment</span>
+          )}
+        </td>
+        <td className="py-3 px-4 text-sm text-text-quaternary-500">{formattedDate}</td>
+      </tr>
+      
+      {/* Expanded details row */}
+      {isExpanded && (
+        <tr className="bg-bg-secondary">
+          <td colSpan={4} className="px-4 py-4">
+            <div className="ml-6 space-y-4">
+              {/* Full Insight Title */}
+              <div>
+                <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                  Insight Title
+                </h4>
+                <p className="text-sm text-text-primary-900">{feedback.insight_title}</p>
+              </div>
+              
+              {/* Insight Type */}
+              <div>
+                <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                  Insight Type
+                </h4>
+                <p className="text-sm text-text-primary-900">{feedback.insight_type}</p>
+              </div>
+              
+              {/* Full Comment */}
+              <div>
+                <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                  User Comment
+                </h4>
+                {feedback.comment ? (
+                  <p className="text-sm text-text-secondary-700 whitespace-pre-wrap bg-bg-primary rounded-lg p-3 border border-border-secondary">
+                    {feedback.comment}
+                  </p>
+                ) : (
+                  <p className="text-sm text-text-quaternary-500 italic">No comment provided</p>
+                )}
+              </div>
+              
+              {/* Metadata */}
+              <div className="flex flex-wrap gap-6 pt-2 border-t border-border-secondary">
+                <div>
+                  <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                    Insight ID
+                  </h4>
+                  <p className="text-xs text-text-tertiary-600 font-mono">{feedback.insight_id}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                    Organization ID
+                  </h4>
+                  <p className="text-xs text-text-tertiary-600 font-mono">{feedback.organization_id}</p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-text-quaternary-500 uppercase tracking-wide mb-1">
+                    Submitted
+                  </h4>
+                  <p className="text-xs text-text-tertiary-600">{formattedDate}</p>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }
 
@@ -314,7 +402,12 @@ export default function AdminDashboardPage() {
                   <table className="w-full">
                     <thead className="bg-bg-secondary">
                       <tr>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-quaternary-500 uppercase tracking-wider">Insight</th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-text-quaternary-500 uppercase tracking-wider">
+                          <span className="flex items-center gap-1">
+                            Insight
+                            <span className="text-text-tertiary-600 normal-case font-normal">(click to expand)</span>
+                          </span>
+                        </th>
                         <th className="text-left py-3 px-4 text-xs font-medium text-text-quaternary-500 uppercase tracking-wider">Rating</th>
                         <th className="text-left py-3 px-4 text-xs font-medium text-text-quaternary-500 uppercase tracking-wider">Comment</th>
                         <th className="text-left py-3 px-4 text-xs font-medium text-text-quaternary-500 uppercase tracking-wider">Date</th>
