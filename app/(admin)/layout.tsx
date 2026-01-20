@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Skeleton } from '@/components/Skeleton'
 import Link from 'next/link'
 
@@ -11,9 +11,8 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { user, loading } = useAuth()
+  const { user, loading, isAdmin, appUser } = useAuth()
   const router = useRouter()
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,32 +20,15 @@ export default function AdminLayout({
     }
   }, [user, loading, router])
 
-  // Check admin access by making a test API call
-  // Backend will return 403 if not admin
+  // Redirect non-admin users once we know their role
   useEffect(() => {
-    if (user && isAuthorized === null) {
-      checkAdminAccess()
+    if (!loading && appUser && !isAdmin) {
+      router.push('/overview')
     }
-  }, [user, isAuthorized])
+  }, [loading, appUser, isAdmin, router])
 
-  const checkAdminAccess = async () => {
-    try {
-      const { apiRequest } = await import('@/lib/api/client')
-      await apiRequest('/api/admin/dashboard')
-      setIsAuthorized(true)
-    } catch (err: unknown) {
-      // Check if it's a 403 error
-      if (err && typeof err === 'object' && 'status' in err && err.status === 403) {
-        setIsAuthorized(false)
-        router.push('/overview')
-      } else {
-        // Other errors (network, etc) - still try to show page
-        setIsAuthorized(true)
-      }
-    }
-  }
-
-  if (loading || isAuthorized === null) {
+  // Show loading while auth state is being determined
+  if (loading || (user && !appUser)) {
     return (
       <div className="min-h-screen bg-bg-primary">
         <div className="flex min-h-screen items-center justify-center">
@@ -59,7 +41,7 @@ export default function AdminLayout({
     )
   }
 
-  if (!user || isAuthorized === false) {
+  if (!user || !isAdmin) {
     return null // Will redirect
   }
 

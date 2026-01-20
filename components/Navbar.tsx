@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/context/ThemeContext'
@@ -8,29 +8,9 @@ import { useAuth } from '@/context/AuthContext'
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-
-  // Check if user is admin (by testing admin endpoint)
-  useEffect(() => {
-    if (user) {
-      checkAdminStatus()
-    } else {
-      setIsAdmin(false)
-    }
-  }, [user])
-
-  const checkAdminStatus = async () => {
-    try {
-      const { apiRequest } = await import('@/lib/api/client')
-      await apiRequest('/api/admin/dashboard')
-      setIsAdmin(true)
-    } catch {
-      setIsAdmin(false)
-    }
-  }
 
   const handleSettingsClick = () => {
     router.push('/settings')

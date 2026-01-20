@@ -5,10 +5,21 @@ import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+// App user data from our backend (includes role)
+interface AppUser {
+  id: string
+  email: string
+  role: string
+  organization_id: string | null
+  organization_name: string | null
+}
+
 interface AuthContextType {
   user: User | null
   session: Session | null
+  appUser: AppUser | null  // Our app's user data with role
   loading: boolean
+  isAdmin: boolean  // Convenience getter
   signUp: (email: string, password: string, organizationName: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
@@ -21,8 +32,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [appUser, setAppUser] = useState<AppUser | null>(null)
+  const [appUserFetched, setAppUserFetched] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  // Fetch app user data (with role) from our backend - only once
+  const fetchAppUser = async () => {
+    if (appUserFetched) return // Already fetched
+    setAppUserFetched(true)
+    try {
+      const { apiRequest } = await import('@/lib/api/client')
+      const data = await apiRequest<AppUser>('/auth/me')
+      setAppUser(data)
+    } catch {
+      setAppUser(null)
+    }
+  }
 
   // Initialize auth state
   useEffect(() => {
@@ -31,6 +57,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Fetch app user data if we have a session
+      if (session?.user) {
+        fetchAppUser()
+      }
     })
 
     // Listen for auth changes
@@ -42,7 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
 
       if (event === 'SIGNED_OUT') {
+        setAppUser(null)
+        setAppUserFetched(false) // Reset so it fetches on next login
         router.push('/login')
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        // Only fetch on actual sign in event, not on page navigation
+        fetchAppUser()
       }
     })
 
@@ -130,7 +166,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         session,
+        appUser,
         loading,
+        isAdmin: appUser?.role === 'admin',
         signUp,
         signIn,
         signInWithGoogle,
