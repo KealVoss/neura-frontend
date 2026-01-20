@@ -40,7 +40,12 @@ interface UpcomingCommitmentsMetrics {
   upcoming_amount: number
   upcoming_count: number
   days_ahead: number
-  large_upcoming_bills: Array<{ label: string; amount: number; due_date: string }>
+  large_upcoming_bills: Array<{ 
+    invoice_number: string | null
+    contact: string | null
+    amount_due: number
+    due_date: string 
+  }>
   squeeze_risk: string
 }
 
