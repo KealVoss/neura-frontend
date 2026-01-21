@@ -224,6 +224,8 @@ export default function OverviewPage() {
     setTriggerTimestamp(undefined)
     // Refresh overview data from store (force refresh)
     await fetchOverview(true)
+    // Also refresh health score to get latest AI-generated text (force refresh to bypass cache)
+    await fetchHealthScore(true)
   }
 
   const handleReSync = async () => {

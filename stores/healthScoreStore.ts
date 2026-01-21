@@ -73,7 +73,20 @@ export interface HealthScoreData {
     rolling_3m: { end_date: string }
     rolling_6m: { end_date: string }
     balance_sheet_asof: string
+    monthly_pnl?: {
+      months_fetched: number
+      months_with_data: number
+    }
   }
+  key_metrics?: {
+    current_cash: number
+    monthly_burn: number
+    runway_months: number | null
+    data_period_days: number
+    period_label: string
+  }
+  why_this_matters?: string
+  assumptions?: string[]
 }
 
 // Cache TTL in milliseconds (20 minutes - health score only changes after sync)

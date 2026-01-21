@@ -59,6 +59,15 @@ interface HealthScoreData {
     }>
     warnings: string[]
   }
+  key_metrics?: {
+    current_cash: number
+    monthly_burn: number
+    runway_months: number | null
+    data_period_days: number
+    period_label: string
+  }
+  why_this_matters?: string
+  assumptions?: string[]
 }
 
 interface HealthScoreCardProps {
@@ -72,21 +81,25 @@ const gradeConfig = {
     label: 'Healthy',
     description: 'Your business is performing excellently with strong cash flow and low risks.',
     badgeClass: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    textClass: 'text-green-600 dark:text-green-400',
   },
   B: {
     label: 'Healthy',
     description: 'Your business is performing well with stable cash flow and manageable risks. A few items need attention but nothing urgent.',
     badgeClass: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    textClass: 'text-green-600 dark:text-green-400',
   },
   C: {
     label: 'At Risk',
     description: 'Your business needs attention. Cash flow challenges and some risks require monitoring.',
     badgeClass: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    textClass: 'text-amber-600 dark:text-amber-400',
   },
   D: {
     label: 'Critical',
     description: 'Your business requires immediate attention. Significant cash flow and risk concerns.',
     badgeClass: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    textClass: 'text-red-600 dark:text-red-400',
   },
 }
 
@@ -100,17 +113,28 @@ const confidenceConfig = {
 function getTrendIcon(score: number, max: number) {
   const percentage = (score / max) * 100
   if (percentage >= 70) {
-    return <span className="text-text-brand-tertiary-600">↗</span>
+    return (
+      <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    )
   } else if (percentage >= 50) {
-    return <span className="text-text-quaternary-500">→</span>
+    return (
+      <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    )
   } else {
-    return <span className="text-amber-500">↘</span>
+    return (
+      <svg className="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+      </svg>
+    )
   }
 }
 
-// Calculate runway months from score
+// Calculate runway months from score (fallback only)
 function getRunwayMonths(score: number): number {
-  // Approximate: higher score = more runway
   if (score >= 80) return 6
   if (score >= 60) return 4
   if (score >= 40) return 2
@@ -197,85 +221,84 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
     )
   }
 
-  const { scorecard, category_scores = {}, drivers, data_quality } = data
+  const { scorecard, category_scores, drivers, data_quality } = data
   const grade = gradeConfig[scorecard?.grade] ?? gradeConfig.D
   const confidence = confidenceConfig[scorecard?.confidence] ?? confidenceConfig.low
-  const runwayMonths = getRunwayMonths(scorecard.final_score)
+  
+  // Type-safe category_scores with proper typing
+  const typedCategoryScores: HealthScoreData['category_scores'] = category_scores ?? {
+    A: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
+    B: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
+    C: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
+    D: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
+    E: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
+  }
+  
+  // Use actual runway_months from key_metrics if available, otherwise estimate from score
+  const runwayMonths = data.key_metrics?.runway_months ?? getRunwayMonths(scorecard.final_score)
+  
+  // Get AI-generated descriptive text (backend provides this)
+  const categoryAMetrics = typedCategoryScores.A?.metrics || []
+  const whyThisMatters = data.why_this_matters || ""
+  const assumptions = data.assumptions || []
 
   // Extract key metrics for the 3-box display (Cash, Revenue, Expenses from categories)
   // Default values handle case when health score hasn't been calculated yet
-  const defaultScore = { points_awarded: 0, max_points: 1 }
-  const cashScore = category_scores.A ?? defaultScore
-  const profitabilityScore = category_scores.B ?? defaultScore
-  const liquidityScore = category_scores.D ?? defaultScore
+  const defaultScore: CategoryScore = { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] }
+  const cashScore = typedCategoryScores.A ?? defaultScore
+  const profitabilityScore = typedCategoryScores.B ?? defaultScore
+  const liquidityScore = typedCategoryScores.D ?? defaultScore
 
   return (
-    <div className="bg-bg-primary rounded-xl border border-border-secondary p-6">
-      {/* Badges Row - Figma 2.2 */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${grade.badgeClass}`}>
-          {grade.label}
+
+    <div className="bg-bg-primary rounded-xl border border-brand-solid p-6">
+
+      {/* Large Score Display */}
+      <div className="mb-4">
+        <span className={`text-5xl font-bold ${grade.textClass}`}>
+          {Math.round(scorecard.final_score)}
         </span>
-        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-border-secondary text-text-secondary-700 bg-white dark:bg-bg-secondary">
-          <svg className="w-3.5 h-3.5 text-text-brand-tertiary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {confidence.label}
-        </span>
+        <span className="text-xl text-text-quaternary-500 ml-1">/100</span>
       </div>
 
-      {/* Title - Figma 2.3 */}
-      <h2 className="text-xl font-semibold text-text-primary-900 mb-4">
-        Business Health Score
-      </h2>
+      {/* Description */}
+      <p className="text-sm text-text-secondary-700 mb-8 max-w-2xl">
+        {grade.description}
+      </p>
 
-      {/* Score Box with Teal Left Border - Figma 2.4 */}
-      <div className="border-l-4 border-l-text-brand-tertiary-600 bg-bg-secondary-subtle dark:bg-bg-secondary rounded-r-lg p-5 mb-4">
-        {/* Large Score Display */}
-        <div className="mb-3">
-          <span className="text-5xl font-bold text-text-primary-900">
-            {Math.round(scorecard.final_score)}
-          </span>
-          <span className="text-xl text-text-quaternary-500 ml-1">/100</span>
-        </div>
-
-        {/* Description */}
-        <p className="text-sm text-text-secondary-700 mb-5">
-          {grade.description}
-        </p>
-
-        {/* Three Metric Boxes - Centered as per Figma 2.4 */}
-        <div className="flex justify-center gap-12 mb-5">
-          <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Cash position</div>
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
-                {Math.round((cashScore.points_awarded / cashScore.max_points) * 100)}
-              </span>
-              {getTrendIcon(cashScore.points_awarded, cashScore.max_points)}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Revenue</div>
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
-                {Math.round((profitabilityScore.points_awarded / profitabilityScore.max_points) * 100)}
-              </span>
-              {getTrendIcon(profitabilityScore.points_awarded, profitabilityScore.max_points)}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Expenses</div>
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
-                {Math.round((liquidityScore.points_awarded / liquidityScore.max_points) * 100)}
-              </span>
-              {getTrendIcon(liquidityScore.points_awarded, liquidityScore.max_points)}
-            </div>
+      {/* Three Metric Boxes - Wrapped in background */}
+      <div className="bg-bg-secondary-subtle dark:bg-bg-secondary rounded-lg p-6 mb-8 flex justify-center gap-12">
+        <div className="text-center">
+          <div className="text-xs text-text-quaternary-500 mb-1">Cash position</div>
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-xl font-semibold text-text-primary-900">
+              {Math.round((cashScore.points_awarded / cashScore.max_points) * 100)}
+            </span>
+            {getTrendIcon(cashScore.points_awarded, cashScore.max_points)}
           </div>
         </div>
+        <div className="text-center">
+          <div className="text-xs text-text-quaternary-500 mb-1">Revenue</div>
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-xl font-semibold text-text-primary-900">
+              {Math.round((profitabilityScore.points_awarded / profitabilityScore.max_points) * 100)}
+            </span>
+            {getTrendIcon(profitabilityScore.points_awarded, profitabilityScore.max_points)}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs text-text-quaternary-500 mb-1">Expenses</div>
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-xl font-semibold text-text-primary-900">
+              {Math.round((liquidityScore.points_awarded / liquidityScore.max_points) * 100)}
+            </span>
+            {getTrendIcon(liquidityScore.points_awarded, liquidityScore.max_points)}
+          </div>
+        </div>
+      </div>
 
-        {/* Runway Summary */}
+      {/* Runway Summary with Separator */}
+      <div className="border-t border-border-secondary pt-6 mb-2">
         <p className="text-sm text-text-secondary-700">
           At your current burn rate, you have approximately {runwayMonths} months of runway remaining.
         </p>
@@ -297,132 +320,170 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
         </button>
       </div>
 
-      {/* Expanded Details Section */}
       {showDetails && (
-        <div className="mt-6 pt-6 border-t border-border-secondary">
-          {/* WHAT WE'RE SEEING - Figma 2.5 */}
+        <div className="mt-8 pt-6 border-t border-border-secondary">
+
+          {/* WHAT WE'RE SEEING - Card Style */}
           <div className="mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary-900 mb-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
               WHAT WE'RE SEEING
             </h3>
-            <ul className="space-y-2">
-              {Object.entries(category_scores).slice(0, 3).map(([key, cat]) => (
-                <li key={key} className="flex items-start gap-2 text-sm text-text-secondary-700">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-text-brand-tertiary-600"></span>
-                  <span>{cat.name}: {Math.round((cat.points_awarded / cat.max_points) * 100)}% of target</span>
-                </li>
-              ))}
-            </ul>
+            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+              <ul className="space-y-3">
+                {categoryAMetrics.length > 0 ? (
+                  categoryAMetrics.map((metric: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary-700">
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-500"></span>
+                      <span>{metric}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm text-text-quaternary-500">No descriptive data available</li>
+                )}
+              </ul>
+            </div>
           </div>
 
-          {/* WHY THIS MATTERS NOW - Figma 2.6 */}
+          {/* WHY THIS MATTERS NOW - Card Style */}
           <div className="mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary-900 mb-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
               WHY THIS MATTERS NOW
             </h3>
-            <div className="bg-bg-secondary-subtle dark:bg-bg-secondary rounded-lg p-4">
-              <p className="text-sm text-text-secondary-700">
-                With {runwayMonths} months of runway, your cash position is {runwayMonths >= 4 ? 'stable for the near term' : 'tight'}. 
-                {runwayMonths >= 4 
-                  ? " This gives you time to plan without immediate pressure. However, it's worth monitoring closely if you're expecting any large expenses or if revenue becomes uncertain."
-                  : " Consider reviewing your expenses and following up on outstanding receivables to improve your position."
-                }
-              </p>
+            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+              {whyThisMatters ? (
+                <p className="text-sm text-text-secondary-700 leading-relaxed">{whyThisMatters}</p>
+              ) : (
+                <p className="text-sm text-text-quaternary-500">No contextual explanation available</p>
+              )}
             </div>
           </div>
 
-          {/* WHAT TO DO NEXT - Figma 2.7 */}
+          {/* WHAT TO DO NEXT - Card Style */}
           {drivers.top_negative.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary-900 mb-3">
+            <div className="mb-8">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
                 WHAT TO DO NEXT
               </h3>
-              <ol className="space-y-2">
-                {drivers.top_negative.slice(0, 3).map((driver, index) => (
-                  <li key={driver.metric_id} className="flex items-start gap-3 text-sm text-text-secondary-700">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-text-brand-tertiary-600/10 text-text-brand-tertiary-600 text-xs font-semibold flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                    <span>{driver.recommended_action}</span>
-                  </li>
-                ))}
-              </ol>
+              <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+                <ol className="space-y-4">
+                  {drivers.top_negative.slice(0, 3).map((driver, index) => (
+                    <li key={driver.metric_id} className="flex items-start gap-3 text-sm text-text-secondary-700">
+                      <span className="flex-shrink-0 w-6 h-6 rounded bg-teal-50 text-teal-700 text-xs font-semibold flex items-center justify-center">
+                        {index + 1}
+                      </span>
+                      <span className="mt-0.5">{driver.recommended_action}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           )}
 
-          {/* Category Breakdown */}
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary-900 mb-4">
-            SCORE BREAKDOWN
-          </h3>
-          <div className="space-y-3 mb-6">
-            {Object.entries(category_scores).map(([key, cat]) => (
-              <div key={key} className="flex items-center gap-3">
-                <span className="text-sm text-text-secondary-700 w-44 truncate">
-                  {cat.name}
-                </span>
-                <div className="flex-1 h-2 bg-bg-secondary rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-text-brand-tertiary-600 transition-all duration-500"
-                    style={{ width: `${(cat.points_awarded / cat.max_points) * 100}%` }}
-                  />
+          {/* KEY NUMBERS */}
+          <div className="mb-8">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
+              KEY NUMBERS
+            </h3>
+            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Current Cash */}
+                <div>
+                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                    <span className="text-text-quaternary-400">$</span> Current cash
+                  </div>
+                  <div className="text-2xl font-bold text-teal-500">
+                    ${Math.abs(data.key_metrics?.current_cash ?? 0).toLocaleString()}
+                  </div>
                 </div>
-                <span className="text-sm text-text-quaternary-500 w-14 text-right">
-                  {Math.round(cat.points_awarded)}/{cat.max_points}
-                </span>
+                {/* Monthly Burn */}
+                <div>
+                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                    <span className="text-text-quaternary-400">$</span> Monthly burn
+                  </div>
+                  <div className="text-2xl font-bold text-teal-500">
+                    ${Math.abs(data.key_metrics?.monthly_burn ?? 0).toLocaleString()}
+                  </div>
+                </div>
+                {/* Data Period */}
+                <div>
+                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                    <svg className="w-3.5 h-3.5 text-text-quaternary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Data period
+                  </div>
+                  <div className="text-2xl font-bold text-teal-500">
+                    {data.key_metrics?.data_period_days ? `${data.key_metrics.data_period_days} days` : '90 days'}
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          {/* Key Drivers */}
-          {(drivers.top_positive.length > 0 || drivers.top_negative.length > 0) && (
-            <>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-primary-900 mb-3">
-                KEY DRIVERS
-              </h3>
-              <div className="space-y-2 mb-6">
-                {drivers.top_negative.slice(0, 3).map((driver) => (
-                  <div
-                    key={driver.metric_id}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <span className="text-red-500">↓</span>
-                    <span className="text-text-secondary-700">{driver.label}</span>
-                    <span className="text-text-quaternary-500 text-xs">
-                      ({Math.round(driver.impact_points)} pts)
-                    </span>
-                  </div>
-                ))}
-                {drivers.top_positive.slice(0, 3).map((driver) => (
-                  <div
-                    key={driver.metric_id}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <span className="text-text-brand-tertiary-600">↑</span>
-                    <span className="text-text-secondary-700">{driver.label}</span>
-                    <span className="text-text-quaternary-500 text-xs">
-                      ({Math.round(driver.impact_points)} pts)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          {/* How we worked this out (Collapsible Footer) */}
+          <details className="group mt-8">
+            <summary className="flex items-center text-teal-700 font-medium cursor-pointer list-none select-none">
+              <svg className="w-5 h-5 mr-2 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+              How we worked this out
+            </summary>
 
-          {/* Data Quality Warnings */}
-          {data_quality.warnings.length > 0 && (
-            <div className="bg-[#fef3c7] dark:bg-[#78350f]/20 border border-[#fbbf24] dark:border-[#fbbf24]/40 rounded-lg p-3">
-              <div className="flex items-start gap-2">
-                <svg className="w-5 h-5 text-[#d97706] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <p className="text-sm text-[#92400e] dark:text-[#fbbf24]">
-                  {data_quality.warnings[0]}
-                </p>
+            <div className="mt-4 p-6 bg-utility-gray-50 rounded-xl border border-border-secondary">
+              {/* FORMULA */}
+              <div className="mb-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">FORMULA</h4>
+                <div className="inline-block bg-white border border-border-secondary rounded-md px-3 py-1.5 text-sm text-text-secondary-700 font-medium shadow-sm">
+                  {data.subscores?.["A1"]?.formula || "Runway = Current Cash ÷ Average Monthly Outflows"}
+                </div>
+              </div>
+
+              {/* INPUTS USED */}
+              <div className="mb-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">INPUTS USED</h4>
+                <div className="flex flex-wrap gap-2">
+                  {(data.subscores?.["A1"]?.inputs_used || []).map((input, i) => (
+                    <span key={i} className="bg-white border border-border-secondary rounded-md px-3 py-1 text-sm text-text-secondary-700 shadow-sm">
+                      {input}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* ASSUMPTIONS */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">ASSUMPTIONS</h4>
+                <ul className="space-y-2">
+                  {assumptions.length > 0 ? (
+                    assumptions.map((assumption: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-text-secondary-700">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500"></span>
+                        <span>{assumption}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-sm text-text-quaternary-500">No assumptions specified</li>
+                  )}
+                </ul>
               </div>
             </div>
+          </details>
+
+          {/* Conditional Warning Banner */}
+          {data_quality.warnings.length > 0 && (
+            <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+              <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm text-amber-800">
+                {data_quality.warnings[0]}
+              </p>
+            </div>
           )}
+
         </div>
       )}
+
     </div>
   )
 }

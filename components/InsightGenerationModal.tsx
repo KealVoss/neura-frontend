@@ -183,7 +183,7 @@ export default function InsightGenerationModal({
     const stepStatus = getStepStatus(stepNumber)
     if (stepStatus === 'completed') {
       if (stepNumber === 1) return 'Connection established'
-      if (stepNumber === 2) return 'Data imported successfully'
+      if (stepNumber === 2) return '12 months transactions found'
       if (stepNumber === 3) return 'Calculations complete'
       if (stepNumber === 4) return 'Insights generated'
     }
