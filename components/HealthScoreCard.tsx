@@ -224,7 +224,7 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
   const { scorecard, category_scores, drivers, data_quality } = data
   const grade = gradeConfig[scorecard?.grade] ?? gradeConfig.D
   const confidence = confidenceConfig[scorecard?.confidence] ?? confidenceConfig.low
-  
+
   // Type-safe category_scores with proper typing
   const typedCategoryScores: HealthScoreData['category_scores'] = category_scores ?? {
     A: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
@@ -233,10 +233,10 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
     D: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
     E: { category_id: '', name: '', max_points: 1, points_awarded: 0, metrics: [] },
   }
-  
+
   // Use actual runway_months from key_metrics if available, otherwise estimate from score
   const runwayMonths = data.key_metrics?.runway_months ?? getRunwayMonths(scorecard.final_score)
-  
+
   // Get AI-generated descriptive text (backend provides this)
   const categoryAMetrics = typedCategoryScores.A?.metrics || []
   const whyThisMatters = data.why_this_matters || ""
@@ -250,240 +250,251 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
   const liquidityScore = typedCategoryScores.D ?? defaultScore
 
   return (
+    <>
 
-    <div className="bg-bg-primary rounded-xl border border-brand-solid p-6">
 
-      {/* Large Score Display */}
-      <div className="mb-4">
-        <span className={`text-5xl font-bold ${grade.textClass}`}>
-          {Math.round(scorecard.final_score)}
-        </span>
-        <span className="text-xl text-text-quaternary-500 ml-1">/100</span>
-      </div>
+      <div className="bg-bg-primary rounded-xl border border-brand-solid p-6">
 
-      {/* Description */}
-      <p className="text-sm text-text-secondary-700 mb-8 max-w-2xl">
-        {grade.description}
-      </p>
-
-      {/* Three Metric Boxes - Wrapped in background */}
-      <div className="bg-bg-secondary-subtle dark:bg-bg-secondary rounded-lg p-6 mb-8 flex justify-center gap-12">
-        <div className="text-center">
-          <div className="text-xs text-text-quaternary-500 mb-1">Cash position</div>
-          <div className="flex items-center justify-center gap-1">
-            <span className="text-xl font-semibold text-text-primary-900">
-              {Math.round((cashScore.points_awarded / cashScore.max_points) * 100)}
-            </span>
-            {getTrendIcon(cashScore.points_awarded, cashScore.max_points)}
-          </div>
+        {/* Large Score Display */}
+        <div className="mb-4">
+          <span className={`text-5xl font-bold ${grade.textClass}`}>
+            {Math.round(scorecard.final_score)}
+          </span>
+          <span className="text-xl text-text-quaternary-500 ml-1">/100</span>
         </div>
-        <div className="text-center">
-          <div className="text-xs text-text-quaternary-500 mb-1">Revenue</div>
-          <div className="flex items-center justify-center gap-1">
-            <span className="text-xl font-semibold text-text-primary-900">
-              {Math.round((profitabilityScore.points_awarded / profitabilityScore.max_points) * 100)}
-            </span>
-            {getTrendIcon(profitabilityScore.points_awarded, profitabilityScore.max_points)}
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-xs text-text-quaternary-500 mb-1">Expenses</div>
-          <div className="flex items-center justify-center gap-1">
-            <span className="text-xl font-semibold text-text-primary-900">
-              {Math.round((liquidityScore.points_awarded / liquidityScore.max_points) * 100)}
-            </span>
-            {getTrendIcon(liquidityScore.points_awarded, liquidityScore.max_points)}
-          </div>
-        </div>
-      </div>
 
-      {/* Runway Summary with Separator */}
-      <div className="border-t border-border-secondary pt-6 mb-2">
-        <p className="text-sm text-text-secondary-700">
-          At your current burn rate, you have approximately {runwayMonths} months of runway remaining.
+        {/* Description */}
+        <p className="text-sm text-text-secondary-700 mb-8 max-w-2xl">
+          {grade.description}
         </p>
-      </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-xs text-text-quaternary-500">
-          <span>Updated daily</span>
+        {/* Three Metric Boxes - Wrapped in background */}
+        <div className="bg-bg-secondary-subtle dark:bg-bg-secondary rounded-lg p-6 mb-8 flex justify-center gap-12">
+          <div className="text-center">
+            <div className="text-xs text-text-quaternary-500 mb-1">Cash position</div>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xl font-semibold text-text-primary-900">
+                {Math.round((cashScore.points_awarded / cashScore.max_points) * 100)}
+              </span>
+              {getTrendIcon(cashScore.points_awarded, cashScore.max_points)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-text-quaternary-500 mb-1">Revenue</div>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xl font-semibold text-text-primary-900">
+                {Math.round((profitabilityScore.points_awarded / profitabilityScore.max_points) * 100)}
+              </span>
+              {getTrendIcon(profitabilityScore.points_awarded, profitabilityScore.max_points)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-text-quaternary-500 mb-1">Expenses</div>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xl font-semibold text-text-primary-900">
+                {Math.round((liquidityScore.points_awarded / liquidityScore.max_points) * 100)}
+              </span>
+              {getTrendIcon(liquidityScore.points_awarded, liquidityScore.max_points)}
+            </div>
+          </div>
         </div>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="flex items-center gap-1 px-4 py-2 bg-bg-brand-solid text-text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium cursor-pointer"
-        >
-          View details
-          <svg className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-90' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-          </svg>
-        </button>
+
+        {/* Runway Summary with Separator */}
+        <div className="border-t border-border-secondary pt-6 mb-2">
+          <p className="text-sm text-text-secondary-700">
+            At your current burn rate, you have approximately {runwayMonths} months of runway remaining.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 text-xs text-text-quaternary-500">
+            <span>Updated daily</span>
+          </div>
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="flex items-center gap-1 px-4 py-2 bg-bg-brand-solid text-text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium cursor-pointer"
+          >
+            View details
+            <svg className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-90' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+
       </div>
 
-      {showDetails && (
-        <div className="mt-8 pt-6 border-t border-border-secondary">
+      {/* Expanded Details Section - Separated from main card */}
+      {
+        showDetails && (
+          <div className="mt-8">
 
-          {/* WHAT WE'RE SEEING - Card Style */}
-          <div className="mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
-              WHAT WE'RE SEEING
-            </h3>
-            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
-              <ul className="space-y-3">
-                {categoryAMetrics.length > 0 ? (
-                  categoryAMetrics.map((metric: string, idx: number) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary-700">
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-500"></span>
-                      <span>{metric}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-sm text-text-quaternary-500">No descriptive data available</li>
-                )}
-              </ul>
-            </div>
-          </div>
-
-          {/* WHY THIS MATTERS NOW - Card Style */}
-          <div className="mb-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
-              WHY THIS MATTERS NOW
-            </h3>
-            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
-              {whyThisMatters ? (
-                <p className="text-sm text-text-secondary-700 leading-relaxed">{whyThisMatters}</p>
-              ) : (
-                <p className="text-sm text-text-quaternary-500">No contextual explanation available</p>
-              )}
-            </div>
-          </div>
-
-          {/* WHAT TO DO NEXT - Card Style */}
-          {drivers.top_negative.length > 0 && (
-            <div className="mb-8">
+            {/* WHAT WE'RE SEEING - Card Style */}
+            <div className="mb-6">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
-                WHAT TO DO NEXT
+                WHAT WE'RE SEEING
               </h3>
               <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
-                <ol className="space-y-4">
-                  {drivers.top_negative.slice(0, 3).map((driver, index) => (
-                    <li key={driver.metric_id} className="flex items-start gap-3 text-sm text-text-secondary-700">
-                      <span className="flex-shrink-0 w-6 h-6 rounded bg-teal-50 text-teal-700 text-xs font-semibold flex items-center justify-center">
-                        {index + 1}
-                      </span>
-                      <span className="mt-0.5">{driver.recommended_action}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
-          )}
-
-          {/* KEY NUMBERS */}
-          <div className="mb-8">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
-              KEY NUMBERS
-            </h3>
-            <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Current Cash */}
-                <div>
-                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
-                    <span className="text-text-quaternary-400">$</span> Current cash
-                  </div>
-                  <div className="text-2xl font-bold text-teal-500">
-                    ${Math.abs(data.key_metrics?.current_cash ?? 0).toLocaleString()}
-                  </div>
-                </div>
-                {/* Monthly Burn */}
-                <div>
-                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
-                    <span className="text-text-quaternary-400">$</span> Monthly burn
-                  </div>
-                  <div className="text-2xl font-bold text-teal-500">
-                    ${Math.abs(data.key_metrics?.monthly_burn ?? 0).toLocaleString()}
-                  </div>
-                </div>
-                {/* Data Period */}
-                <div>
-                  <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
-                    <svg className="w-3.5 h-3.5 text-text-quaternary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Data period
-                  </div>
-                  <div className="text-2xl font-bold text-teal-500">
-                    {data.key_metrics?.data_period_days ? `${data.key_metrics.data_period_days} days` : '90 days'}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* How we worked this out (Collapsible Footer) */}
-          <details className="group mt-8">
-            <summary className="flex items-center text-teal-700 font-medium cursor-pointer list-none select-none">
-              <svg className="w-5 h-5 mr-2 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-              How we worked this out
-            </summary>
-
-            <div className="mt-4 p-6 bg-utility-gray-50 rounded-xl border border-border-secondary">
-              {/* FORMULA */}
-              <div className="mb-6">
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">FORMULA</h4>
-                <div className="inline-block bg-white border border-border-secondary rounded-md px-3 py-1.5 text-sm text-text-secondary-700 font-medium shadow-sm">
-                  {data.subscores?.["A1"]?.formula || "Runway = Current Cash ÷ Average Monthly Outflows"}
-                </div>
-              </div>
-
-              {/* INPUTS USED */}
-              <div className="mb-6">
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">INPUTS USED</h4>
-                <div className="flex flex-wrap gap-2">
-                  {(data.subscores?.["A1"]?.inputs_used || []).map((input, i) => (
-                    <span key={i} className="bg-white border border-border-secondary rounded-md px-3 py-1 text-sm text-text-secondary-700 shadow-sm">
-                      {input}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* ASSUMPTIONS */}
-              <div>
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">ASSUMPTIONS</h4>
-                <ul className="space-y-2">
-                  {assumptions.length > 0 ? (
-                    assumptions.map((assumption: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-text-secondary-700">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500"></span>
-                        <span>{assumption}</span>
+                <ul className="space-y-3">
+                  {categoryAMetrics.length > 0 ? (
+                    categoryAMetrics.map((metric: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-3 text-sm text-text-secondary-700">
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-500"></span>
+                        <span>{metric}</span>
                       </li>
                     ))
                   ) : (
-                    <li className="text-sm text-text-quaternary-500">No assumptions specified</li>
+                    <li className="text-sm text-text-quaternary-500">No descriptive data available</li>
                   )}
                 </ul>
               </div>
             </div>
-          </details>
 
-          {/* Conditional Warning Banner */}
-          {data_quality.warnings.length > 0 && (
-            <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-              <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <p className="text-sm text-amber-800">
-                {data_quality.warnings[0]}
-              </p>
+            {/* WHY THIS MATTERS NOW - Card Style */}
+            <div className="mb-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
+                WHY THIS MATTERS NOW
+              </h3>
+              <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+                {whyThisMatters ? (
+                  <p className="text-sm text-text-secondary-700 leading-relaxed">{whyThisMatters}</p>
+                ) : (
+                  <p className="text-sm text-text-quaternary-500">No contextual explanation available</p>
+                )}
+              </div>
             </div>
-          )}
 
-        </div>
-      )}
+            {/* WHAT TO DO NEXT - Card Style */}
+            {drivers.top_negative.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
+                  WHAT TO DO NEXT
+                </h3>
+                <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+                  <ol className="space-y-4">
+                    {drivers.top_negative.slice(0, 3).map((driver, index) => (
+                      <li key={driver.metric_id} className="flex items-start gap-3 text-sm text-text-secondary-700">
+                        <span className="flex-shrink-0 w-6 h-6 rounded bg-teal-50 text-teal-700 text-xs font-semibold flex items-center justify-center">
+                          {index + 1}
+                        </span>
+                        <span className="mt-0.5">{driver.recommended_action}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            )}
 
-    </div>
+            {/* KEY NUMBERS */}
+            <div className="mb-8">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-3 px-1">
+                KEY NUMBERS
+              </h3>
+              <div className="bg-bg-primary rounded-xl border border-border-secondary p-6 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Current Cash */}
+                  <div>
+                    <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                      <span className="text-text-quaternary-400">$</span> Current cash
+                    </div>
+                    <div className="text-2xl font-bold text-teal-500">
+                      ${Math.abs(data.key_metrics?.current_cash ?? 0).toLocaleString()}
+                    </div>
+                  </div>
+                  {/* Monthly Burn */}
+                  <div>
+                    <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                      <span className="text-text-quaternary-400">$</span> Monthly burn
+                    </div>
+                    <div className="text-2xl font-bold text-teal-500">
+                      ${Math.abs(data.key_metrics?.monthly_burn ?? 0).toLocaleString()}
+                    </div>
+                  </div>
+                  {/* Data Period */}
+                  <div>
+                    <div className="flex items-center gap-1 text-xs text-text-quaternary-500 mb-1">
+                      <svg className="w-3.5 h-3.5 text-text-quaternary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Data period
+                    </div>
+                    <div className="text-2xl font-bold text-teal-500">
+                      {data.key_metrics?.data_period_days ? `${data.key_metrics.data_period_days} days` : '90 days'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* How we worked this out (Collapsible Footer) */}
+            <details className="group mt-8">
+              <summary className="flex items-center text-teal-700 font-medium cursor-pointer list-none select-none">
+                <svg className="w-5 h-5 mr-2 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                How we worked this out
+              </summary>
+
+              <div className="mt-4 p-6 bg-utility-gray-50 rounded-xl border border-border-secondary">
+                {/* FORMULA */}
+                <div className="mb-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">FORMULA</h4>
+                  <div className="inline-block bg-white border border-border-secondary rounded-md px-3 py-1.5 text-sm text-text-secondary-700 font-medium shadow-sm">
+                    Runway = Current Cash ÷ Average Monthly Outflows
+                  </div>
+                </div>
+
+                {/* INPUTS USED */}
+                <div className="mb-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">INPUTS USED</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Bank transactions (90 days)",
+                      "Outstanding invoices",
+                      "Recurring expenses",
+                      "Payroll schedule"
+                    ].map((input, i) => (
+                      <span key={i} className="bg-white border border-border-secondary rounded-md px-3 py-1 text-sm text-text-secondary-700 shadow-sm">
+                        {input}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ASSUMPTIONS */}
+                <div>
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary-500 mb-2">ASSUMPTIONS</h4>
+                  <ul className="space-y-2">
+                    {assumptions.length > 0 ? (
+                      assumptions.map((assumption: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-text-secondary-700">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500"></span>
+                          <span>{assumption}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-sm text-text-quaternary-500">No assumptions specified</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </details>
+
+            {/* Conditional Warning Banner */}
+            {data_quality.warnings.length > 0 && (
+              <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="text-sm text-amber-800">
+                  {data_quality.warnings[0]}
+                </p>
+              </div>
+            )}
+
+          </div>
+        )}
+    </>
   )
 }
+
