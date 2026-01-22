@@ -20,7 +20,7 @@ interface AuthContextType {
   appUser: AppUser | null  // Our app's user data with role
   loading: boolean
   isAdmin: boolean  // Convenience getter
-  signUp: (email: string, password: string, organizationName: string) => Promise<void>
+  signUp: (name: string, email: string, password: string, organizationName: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>

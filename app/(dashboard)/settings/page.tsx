@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext'
 import { apiRequest } from '@/lib/api/client'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SettingsSkeleton } from '@/components/SettingsSkeleton'
+import XeroConnectModal from '@/components/XeroConnectModal'
 
 interface XeroIntegration {
   is_connected: boolean
@@ -29,7 +30,7 @@ export default function SettingsPage() {
   const searchParams = useSearchParams()
   const { settings, isLoading, error: storeError, fetchSettings, updateOrgName } = useSettingsStore()
   const [error, setError] = useState<string | null>(null)
-  const [connecting, setConnecting] = useState(false)
+  const [showXeroModal, setShowXeroModal] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [orgName, setOrgName] = useState('')
   const [savingOrgName, setSavingOrgName] = useState(false)
@@ -89,18 +90,9 @@ export default function SettingsPage() {
     }
   }
 
-  const handleReconnect = async () => {
-    try {
-      setConnecting(true)
-      setError(null)
-      // Fetch the authorization URL from backend
-      const response = await apiRequest<{ authorization_url: string; state: string }>('/integrations/xero/connect')
-      // Redirect to Xero authorization page
-      window.location.href = response.authorization_url
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect to Xero')
-      setConnecting(false)
-    }
+  const handleConnect = () => {
+    setError(null)
+    setShowXeroModal(true)
   }
 
   const formatDate = (dateString: string | null) => {
@@ -263,37 +255,15 @@ export default function SettingsPage() {
                   {xeroIntegration?.is_connected ? (
                     <>
                       <button
-                        onClick={handleReconnect}
-                        disabled={connecting || disconnecting}
+                        onClick={handleConnect}
+                        disabled={disconnecting}
                         className="flex items-center gap-2 text-sm font-medium text-text-brand-tertiary-600 hover:underline whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {connecting && (
-                          <svg
-                            className="h-4 w-4 animate-spin"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                        )}
                         Reconnect
                       </button>
                       <button
                         onClick={handleDisconnect}
-                        disabled={connecting || disconnecting}
+                        disabled={disconnecting}
                         className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {disconnecting && (
@@ -323,33 +293,10 @@ export default function SettingsPage() {
                     </>
                   ) : (
                     <button
-                      onClick={handleReconnect}
-                      disabled={connecting}
-                      className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleConnect}
+                      className="flex items-center gap-2 whitespace-nowrap rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary-subtle px-3 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer"
                     >
-                      {connecting && (
-                        <svg
-                          className="h-4 w-4 animate-spin"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                      )}
-                      {connecting ? 'Connecting...' : 'Connect'}
+                      Connect
                     </button>
                   )}
                 </div>
@@ -443,6 +390,12 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Xero Connect Modal */}
+      <XeroConnectModal
+        isOpen={showXeroModal}
+        onClose={() => setShowXeroModal(false)}
+      />
     </div>
   )
 }
