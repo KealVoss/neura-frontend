@@ -187,7 +187,7 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
   // Empty state
   if (!data) {
     return (
-      <div className="bg-bg-primary rounded-xl border border-border-secondary p-6">
+      <div className="bg-bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl border border-border-secondary p-6">
         {/* Badges */}
         <div className="flex items-center gap-2 mb-3">
           <span className="px-3 py-1 rounded-full text-xs font-medium bg-utility-gray-200 text-text-quaternary-500">
@@ -253,7 +253,7 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
     <>
 
 
-      <div className="bg-bg-primary rounded-xl border border-brand-solid p-6">
+      <div className="bg-bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl border border-brand-solid p-6">
         {/* Badges */}
         <div className="flex items-center gap-2 mb-6">
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${grade.badgeClass}`}>

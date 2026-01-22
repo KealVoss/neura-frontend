@@ -486,7 +486,7 @@ export default function OverviewPage() {
                 <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
                   RESOLVED
                 </h2>
-                <div className="rounded-lg border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-3">
+                <div className="rounded-tl-2xl rounded-bl-2xl rounded-tr-lg rounded-br-lg border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-3">
                   {resolvedInsights.map((insight) => (
                     <div
                       key={insight.insight_id}

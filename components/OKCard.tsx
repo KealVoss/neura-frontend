@@ -29,7 +29,7 @@ export default function OKCard({
   const suggestedAction = insight.recommended_actions[0] || ''
 
   return (
-    <div className="rounded-lg border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
+    <div className="rounded-tl-2xl rounded-bl-2xl rounded-tr-lg rounded-br-lg border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* OK Badge - Figma 1.8: outlined, not filled */}
