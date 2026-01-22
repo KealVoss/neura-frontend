@@ -147,19 +147,28 @@ export default function WatchCard({
             </div>
           )}
           
-          {/* Expand Link */}
-          <button
-            onClick={onExpand}
-            className="flex items-center gap-1 text-sm text-[#FABE6C] hover:underline cursor-pointer"
-          >
-            <svg className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            How we worked this out
-          </button>
+          {/* Bottom Row - How we worked this out + Resolve button */}
+          <div className="flex items-center justify-between mt-3">
+            <button
+              onClick={onExpand}
+              className="flex items-center gap-1 text-sm text-[#FABE6C] hover:underline cursor-pointer"
+            >
+              <svg className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              How we worked this out
+            </button>
+            <button
+              onClick={onResolve}
+              disabled={isLoading}
+              className="rounded-md border border-border-primary bg-bg-primary dark:bg-bg-primary px-4 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Resolving...' : 'Resolve'}
+            </button>
+          </div>
         </div>
         
-        {/* Right Side - Timeframe & Actions */}
+        {/* Right Side - Timeframe only */}
         <div className="flex flex-col items-end gap-2">
           {timeframe && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-warning-tag dark:bg-bg-warning-tag border border-bg-warning-input dark:border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412] dark:text-text-warning-dark">
@@ -169,13 +178,6 @@ export default function WatchCard({
               <span>~{typeof timeframe.value === 'number' ? timeframe.value : timeframe.value} days</span>
             </span>
           )}
-          <button
-            onClick={onResolve}
-            disabled={isLoading}
-            className="rounded-md border border-border-primary bg-bg-primary dark:bg-bg-primary px-4 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Resolving...' : 'Resolve'}
-          </button>
         </div>
       </div>
 
