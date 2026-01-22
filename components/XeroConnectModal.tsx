@@ -116,16 +116,16 @@ export default function XeroConnectModal({ isOpen, onClose }: XeroConnectModalPr
             WHAT WE ACCESS
           </h3>
           <div className="flex flex-wrap gap-3">
-            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-text-primary-900">
+            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-[#181d27] dark:!text-white">
               Bank transactions
             </span>
-            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-text-primary-900">
+            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-[#181d27] dark:!text-white">
               Invoices
             </span>
-            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-text-primary-900">
+            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-[#181d27] dark:!text-white">
               Bills
             </span>
-            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-text-primary-900">
+            <span className="rounded-lg border border-text-brand-tertiary-600/40 bg-[#E6FFFA] dark:bg-[#0f3d37] px-4 py-2 text-base font-medium text-[#181d27] dark:!text-white">
               Contacts
             </span>
           </div>
