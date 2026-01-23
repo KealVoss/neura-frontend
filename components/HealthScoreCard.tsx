@@ -421,7 +421,7 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
                       <span className="text-text-quaternary-400">$</span> Current cash
                     </div>
                     <div className="text-2xl font-bold text-teal-500">
-                      ${Math.abs(data.key_metrics?.current_cash ?? 0).toLocaleString()}
+                      {(data.key_metrics?.current_cash ?? 0) < 0 ? '-' : ''}${Math.abs(data.key_metrics?.current_cash ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                   </div>
                   {/* Monthly Burn */}

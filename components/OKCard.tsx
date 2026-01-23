@@ -48,7 +48,7 @@ export default function OKCard({
                 {impactAmount && (
                   <span className="text-text-brand-tertiary-600 font-medium">
                     {typeof impactAmount.value === 'number' 
-                      ? `${impactAmount.value >= 0 ? '+' : ''}$${Math.abs(impactAmount.value).toLocaleString()}`
+                      ? `${impactAmount.value >= 0 ? '+' : '-'}$${Math.abs(impactAmount.value).toLocaleString()}`
                       : impactAmount?.value || ''}
                   </span>
                 )}

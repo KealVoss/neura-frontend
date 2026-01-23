@@ -24,7 +24,7 @@ function formatKeyNumber(label: string, value: string | number): { formatted: st
   if (typeof value === 'number' || (typeof value === 'string' && value.includes('$'))) {
     const numValue = typeof value === 'number' ? value : parseFloat(value.replace(/[^0-9.-]/g, ''))
     if (!isNaN(numValue)) {
-      const formatted = typeof value === 'string' ? value : `$${Math.abs(numValue).toLocaleString()}`
+      const formatted = typeof value === 'string' ? value : `${numValue < 0 ? '-' : ''}$${Math.abs(numValue).toLocaleString()}`
       return { formatted, colorClass: orangeClass }
     }
   }
@@ -133,7 +133,7 @@ export default function WatchCard({
             <span className="inline-flex items-center gap-1 rounded-full bg-bg-warning-tag dark:bg-bg-warning-tag border border-bg-warning-input dark:border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412] dark:text-text-warning-dark">
               <span>$</span>
               <span>{typeof financialDetail.value === 'number'
-                ? `${financialDetail.value >= 0 ? '+' : ''}$${Math.abs(financialDetail.value).toLocaleString()} vs average`
+                ? `${financialDetail.value >= 0 ? '+' : '-'}$${Math.abs(financialDetail.value).toLocaleString()} vs average`
                 : `${financialDetail.value} vs average`}
               </span>
             </span>
