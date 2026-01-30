@@ -24,7 +24,7 @@ interface TestConnectionResponse {
 const PROVIDER_MODELS: Record<string, string[]> = {
     openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4', 'gpt-5'],
     anthropic: ['claude-sonnet-4-20250514', 'claude-sonnet-4-5-20250929', 'claude-opus-4-5-20251101', 'claude-haiku-4-5-20251001'],
-    gemini: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash', 'gemini-3-pro'],
+    gemini: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-previe'],
 }
 
 const PROVIDER_LABELS: Record<string, string> = {
