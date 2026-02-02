@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiRequest } from '@/lib/api/client'
+import { useToast } from '@/context/ToastContext'
 import { Skeleton } from './Skeleton'
 
 export interface AIProviderConfig {
@@ -41,6 +42,7 @@ const PROVIDER_LABELS: Record<string, string> = {
 }
 
 export default function AIProviderSettings({ initialConfig, isLoading = false, onConfigUpdate }: AIProviderSettingsProps) {
+    const { showToast } = useToast()
     const [config, setConfig] = useState<AIProviderConfig | null>(initialConfig || null)
     const [loading, setLoading] = useState(!initialConfig && !isLoading)
     const [error, setError] = useState<string | null>(null)
@@ -56,6 +58,14 @@ export default function AIProviderSettings({ initialConfig, isLoading = false, o
     const [saving, setSaving] = useState(false)
     const [testing, setTesting] = useState(false)
     const [testResult, setTestResult] = useState<TestConnectionResponse | null>(null)
+
+    // Track if form has unsaved changes
+    const isDirty = config ? (
+        provider !== config.active_provider ||
+        model !== (config.model || '') ||
+        apiKey !== '' // API key entered means user wants to save
+    ) : false // No config loaded yet = not dirty
+
 
     const fetchConfig = useCallback(async () => {
         try {
@@ -151,6 +161,9 @@ export default function AIProviderSettings({ initialConfig, isLoading = false, o
             if (onConfigUpdate) {
                 onConfigUpdate(data)
             }
+
+            // Show success toast (2 second duration)
+            showToast('Configuration saved successfully', 'success', 2000)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to save AI config')
         } finally {
@@ -320,11 +333,17 @@ export default function AIProviderSettings({ initialConfig, isLoading = false, o
                     API Key
                 </label>
                 <div className="relative">
+                    {/* Hidden dummy input to confuse autofill */}
+                    <input type="text" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} aria-hidden="true" />
+
                     <input
                         type={showApiKey ? 'text' : 'password'}
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
+                        onFocus={(e) => e.target.removeAttribute('readonly')}
                         placeholder={`Enter ${PROVIDER_LABELS[provider]} API Key`}
+                        autoComplete="new-password"
+                        readOnly
                         className="w-full rounded-md border border-border-secondary bg-bg-primary px-3 py-2 text-sm text-text-primary-900 focus:border-text-brand-tertiary-600 focus:outline-none focus:ring-1 focus:ring-text-brand-tertiary-600"
                     />
                     <button
@@ -347,20 +366,33 @@ export default function AIProviderSettings({ initialConfig, isLoading = false, o
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                     onClick={handleTestConnection}
-                    disabled={testing || !apiKey}
-                    className="rounded-md border border-border-secondary px-3 py-2 text-sm font-medium text-text-secondary-700 hover:bg-bg-secondary disabled:opacity-50"
+                    disabled={testing}
+                    className="rounded-md border border-border-secondary px-3 py-2 text-sm font-medium text-text-secondary-700 hover:bg-bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {testing ? 'Testing...' : 'Test Connection'}
                 </button>
                 <button
                     onClick={handleSave}
-                    disabled={saving || !apiKey}
-                    className="rounded-md bg-text-brand-tertiary-600 px-3 py-2 text-sm font-medium text-white hover:bg-text-brand-tertiary-700 disabled:opacity-50"
+                    disabled={saving || !isDirty}
+                    className="rounded-md bg-text-brand-tertiary-600 px-3 py-2 text-sm font-medium text-white hover:bg-text-brand-tertiary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving ? (
+                        'Saving...'
+                    ) : (
+                        <>
+                            {!isDirty && config && (
+                                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white">
+                                    <svg className="h-3 w-3 text-[#079455]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            )}
+                            Save Changes
+                        </>
+                    )}
                 </button>
             </div>
 
