@@ -14,12 +14,28 @@ export function SettingsSkeleton() {
         <div className="flex flex-col gap-8 md:flex-row">
           {/* Left Column - Main Settings */}
           <div className="space-y-8 md:flex-1">
+            {/* Organization Section Skeleton */}
+            <section>
+              <Skeleton className="mb-4 h-3.5 w-32 rounded" />
+              <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <Skeleton className="h-4 w-40 rounded" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-10 w-48 rounded-md" />
+                    <Skeleton className="h-10 w-16 rounded-md" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* Account Section Skeleton */}
             <section>
               <Skeleton className="mb-4 h-3.5 w-32 rounded" />
               <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
-                <Skeleton className="mb-2 h-4 w-40 rounded" />
-                <Skeleton className="h-3.5 w-64 rounded" />
+                <div className="flex items-center justify-between gap-4">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-10 w-64 rounded-md" />
+                </div>
               </div>
             </section>
 
@@ -41,50 +57,43 @@ export function SettingsSkeleton() {
             <section>
               <Skeleton className="mb-4 h-3.5 w-32 rounded" />
               <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4">
-                <Skeleton className="mb-2 h-4 w-full rounded" />
-                <Skeleton className="h-4 w-3/4 rounded" />
+                <div className="flex items-center justify-between gap-4">
+                  <Skeleton className="h-4 w-32 rounded" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                </div>
               </div>
             </section>
+
+            {/* Log out button skeleton */}
+            <Skeleton className="h-10 w-24 rounded-md" />
           </div>
 
-          {/* Right Column - AI Provider Skeleton (matches actual sidebar width) */}
+          {/* Right Column - AI Provider Skeleton */}
           <div className="md:w-[400px] md:shrink-0">
             <Skeleton className="mb-4 h-3.5 w-32 rounded" />
-            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-5">
+            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-4">
               {/* Provider Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24 rounded" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-16 rounded" />
                 <Skeleton className="h-10 w-full rounded-md" />
               </div>
 
               {/* Model Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24 rounded" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-16 rounded" />
                 <Skeleton className="h-10 w-full rounded-md" />
               </div>
 
               {/* API Key Skeleton */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24 rounded" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-3 w-16 rounded" />
                 <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-
-              {/* Sliders Skeleton */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-24 rounded" />
-                  <Skeleton className="h-2 w-full rounded-full" />
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-24 rounded" />
-                  <Skeleton className="h-2 w-full rounded-full" />
-                </div>
               </div>
 
               {/* Actions Skeleton */}
               <div className="flex justify-end gap-3 pt-2">
-                <Skeleton className="h-9 w-24 rounded-md" />
-                <Skeleton className="h-9 w-24 rounded-md" />
+                <Skeleton className="h-9 w-32 rounded-md" />
+                <Skeleton className="h-9 w-32 rounded-md" />
               </div>
             </div>
           </div>

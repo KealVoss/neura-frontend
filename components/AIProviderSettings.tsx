@@ -215,29 +215,29 @@ export default function AIProviderSettings({ initialConfig, isLoading = false, o
     // Loading Skeleton
     if (loading) {
         return (
-            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-5">
+            <div className="rounded-md border border-border-secondary bg-bg-secondary-subtle dark:bg-bg-secondary p-4 space-y-4">
                 {/* Provider Skeleton */}
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-24 rounded" />
+                <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-16 rounded" />
                     <Skeleton className="h-10 w-full rounded-md" />
                 </div>
 
                 {/* Model Skeleton */}
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-24 rounded" />
+                <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-16 rounded" />
                     <Skeleton className="h-10 w-full rounded-md" />
                 </div>
 
                 {/* API Key Skeleton */}
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-24 rounded" />
+                <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-16 rounded" />
                     <Skeleton className="h-10 w-full rounded-md" />
                 </div>
 
                 {/* Actions Skeleton */}
                 <div className="flex justify-end gap-3 pt-2">
-                    <Skeleton className="h-9 w-24 rounded-md" />
-                    <Skeleton className="h-9 w-24 rounded-md" />
+                    <Skeleton className="h-9 w-32 rounded-md" />
+                    <Skeleton className="h-9 w-32 rounded-md" />
                 </div>
             </div>
         )
