@@ -13,12 +13,11 @@ interface WatchCardProps {
   isLoading?: boolean
 }
 
-// Helper to format value with color coding
+// Helper to format value with color coding (light: orange; dark: #F79009 per Figma Key numbers)
 function formatKeyNumber(label: string, value: string | number): { formatted: string; colorClass: string } {
   const lowerLabel = label.toLowerCase()
 
-  // Standard orange color for WatchCard key numbers (light: #F79009, dark: uses CSS variable)
-  const orangeClass = 'text-[#F79009] dark:text-[#fdba74]'
+  const orangeClass = 'text-[#F79009] dark:text-[#F79009]'
 
   // Money values
   if (typeof value === 'number' || (typeof value === 'string' && value.includes('$'))) {
@@ -99,10 +98,14 @@ export default function WatchCard({
   const inputsUsed = getInputsUsed()
 
   return (
-    <div className="relative rounded-tl-2xl rounded-bl-2xl rounded-tr-lg rounded-br-lg border border-border-secondary bg-bg-warning-card dark:bg-bg-warning-card p-4 border-l-[3px] border-l-[#F79009]">
-      {/* Timeframe badge - absolutely positioned in top right */}
+    <div
+      className="relative rounded-tl-2xl rounded-bl-2xl rounded-tr-lg rounded-br-lg border border-border-secondary bg-bg-warning-card p-4 border-l-[3px] border-l-[#F79009]
+        dark:rounded-2xl dark:border dark:border-[#F79009] dark:border-l-2 dark:bg-[#4E1D09] dark:shadow-[0px_1px_2px_-1px_#FDB022]"
+    >
+      {/* Timeframe badge - absolutely positioned top right; dark: lg Pill Warning */}
       {timeframe && (
-        <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-bg-warning-tag dark:bg-bg-warning-tag border border-bg-warning-input dark:border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412] dark:text-text-warning-dark">
+        <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-bg-warning-tag border border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412]
+          dark:border-0 dark:bg-[#F79009] dark:px-3 dark:py-1 dark:text-sm dark:text-white">
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -111,26 +114,37 @@ export default function WatchCard({
       )}
 
       <div className="pr-24">
-        {/* Badges Row - Figma 1.5 */}
+        {/* Badges Row - WATCH (sm Warning) + Confidence (sm Gray, icon leading) */}
         <div className="mb-2 flex items-center gap-2">
           <span className="rounded-full bg-[#F79009] px-2.5 py-0.5 text-xs font-semibold text-white uppercase">
             WATCH
           </span>
-          <span className="flex items-center gap-1.5 rounded-full border border-border-primary bg-bg-confidence dark:bg-bg-confidence px-2.5 py-0.5 text-xs font-medium text-text-secondary-700">
-            <svg className="w-3.5 h-3.5 text-text-brand-tertiary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span className="flex items-center gap-1.5 rounded-full border border-border-primary bg-bg-confidence px-2.5 py-0.5 text-xs font-medium text-text-secondary-700
+            dark:border-[#742C0C] dark:bg-[#2a2a2a] dark:text-[#F7F7F7]">
+            <svg className="w-3.5 h-3.5 text-text-brand-tertiary-600 dark:text-[#94979C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {insight.confidence_level === 'high' ? 'High' : insight.confidence_level === 'medium' ? 'Medium' : 'Low'} confidence
           </span>
         </div>
 
-        {/* Title */}
-        <h3 className="mb-1 break-words text-base font-semibold text-text-primary-900">{insight.title}</h3>
+        {/* Title - dark: #F7F7F7 Text lg/Semibold; optional info-circle next to "days" */}
+        <h3 className="mb-1 break-words text-base font-semibold text-text-primary-900 dark:text-lg dark:text-[#F7F7F7]">
+          {insight.title}
+          {timeframe && (
+            <span className="ml-1 inline-flex align-middle" title="Timeframe detail">
+              <svg className="h-4 w-4 text-text-quaternary-500 dark:text-[#F7F7F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+          )}
+        </h3>
 
-        {/* Financial Detail Badge */}
+        {/* Financial Detail Badge - dark: lg Pill Warning (orange bg, white text) */}
         {financialDetail && (
           <div className="mb-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-bg-warning-tag dark:bg-bg-warning-tag border border-bg-warning-input dark:border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412] dark:text-text-warning-dark">
+            <span className="inline-flex items-center gap-1 rounded-full bg-bg-warning-tag border border-bg-warning-input px-2.5 py-0.5 text-xs font-medium text-[#9a3412]
+              dark:border-0 dark:bg-[#F79009] dark:px-3 dark:py-1 dark:text-sm dark:text-white">
               <span>$</span>
               <span>{typeof financialDetail.value === 'number'
                 ? `${financialDetail.value >= 0 ? '+' : '-'}$${Math.abs(financialDetail.value).toLocaleString()} vs average`
@@ -140,50 +154,59 @@ export default function WatchCard({
           </div>
         )}
 
-        {/* Summary */}
-        <p className="mb-3 break-words text-sm leading-relaxed text-text-secondary-700">{insight.summary}</p>
+        {/* Summary - dark: #F7F7F7 Text sm/Regular */}
+        <p className="mb-3 break-words text-sm leading-relaxed text-text-secondary-700 dark:text-[#F7F7F7]">{insight.summary}</p>
 
-        {/* Suggested Action Box - Figma shows orange/coral box */}
-        {suggestedAction && !isExpanded && (
-          <div className="mb-3 rounded-md bg-bg-warning-action dark:bg-bg-warning-action border border-bg-warning-input dark:border-bg-warning-input p-3">
-            <p className="text-xs font-semibold text-[#9a3412] dark:text-text-warning-dark mb-1">Suggested action</p>
-            <p className="text-sm text-[#9a3412] dark:text-[#fdba74]">{suggestedAction}</p>
+        {/* Suggested Action Box - light: bg #FEF0C7; dark: bg #792E0D, border #93370D */}
+        {suggestedAction && (
+          <div className="mb-6 rounded-md border p-3 bg-[#FEF0C7] border-[#F79009]/40 dark:border-[#93370D] dark:bg-[#792E0D]">
+            <p className="text-xs font-semibold text-[#F89C20] mb-1 dark:text-[#F79009]">Suggested action</p>
+            <p className="text-sm text-[#F89C20] dark:text-[#F79009]">{suggestedAction}</p>
           </div>
         )}
 
-        {/* Bottom Row - How we worked this out + Resolve button */}
-        <div className="flex items-center justify-between mt-3">
+        {/* First horizontal line + spacing (after suggested action); color from CSS var (dark #742C0C) */}
+        <div className="border-t pt-6 watch-card-divider-line">
+          {/* Bottom Row - How we worked this out #F79009; Resolve Secondary */}
+          <div className="flex h-5 items-center justify-between">
           <button
             onClick={onExpand}
-            className="flex items-center gap-1 text-sm font-semibold text-[#F79009] hover:underline cursor-pointer"
+            className="flex items-center gap-1 text-sm font-semibold text-[#F79009] hover:underline cursor-pointer dark:font-normal"
           >
-            <svg className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Light: right-pointing chevron, rotates 90 when expanded */}
+            <svg className={`h-4 w-4 transition-transform dark:hidden ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            {/* Dark: chevron-down (Figma 12), rotates 180 when expanded */}
+            <svg className={`h-4 w-4 transition-transform hidden dark:block ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
             How we worked this out
           </button>
           <button
             onClick={onResolve}
             disabled={isLoading}
-            className="rounded-md border border-border-primary bg-bg-primary dark:bg-bg-primary px-4 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md border border-border-primary bg-bg-primary px-4 py-1.5 text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
+              dark:border-[#742C0C] dark:bg-[#2a2a2a] dark:text-[#F7F7F7] dark:hover:bg-[#1f1f1f]"
           >
             {isLoading ? 'Resolving...' : 'Resolve'}
           </button>
+          </div>
         </div>
       </div>
 
-      {/* Expanded Content - Figma 1.6 */}
+      {/* Second horizontal line + expanded content - same width as first line (pr-24); Frame 51 dark */}
       {isExpanded && (
-        <div className="mt-4 space-y-4 border-t border-border-secondary pt-4">
-          {/* WHAT WE'RE SEEING */}
+        <div className="mt-8 space-y-4 border-t pt-6 pr-24 watch-card-divider-line dark:rounded-b-2xl dark:bg-[#4E1D09]">
+          {/* WHAT WE'RE SEEING - Overline #F7F7F7; Ellipse 4x4 #F79009; Text xs/Regular #F7F7F7 */}
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900 dark:text-[#F7F7F7]">
               WHAT WE'RE SEEING
             </h4>
-            <ul className="space-y-1.5 text-sm leading-relaxed text-text-secondary-700">
+            <ul className="space-y-1.5 text-sm leading-relaxed text-text-secondary-700 dark:text-xs dark:text-[#F7F7F7]">
               {insight.why_it_matters.split('\n').filter(line => line.trim()).map((line, i) => (
                 <li key={i} className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F89D25]"></span>
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#F89D25] dark:mt-2 dark:h-1 dark:w-1 dark:bg-[#F79009]" />
                   <span className="break-words">{line}</span>
                 </li>
               ))}
@@ -193,13 +216,13 @@ export default function WatchCard({
           {/* RECOMMENDED ACTIONS */}
           {insight.recommended_actions.length > 0 && (
             <div>
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900 dark:text-[#F7F7F7]">
                 RECOMMENDED ACTIONS
               </h4>
-              <ul className="space-y-1.5 text-sm leading-relaxed text-text-secondary-700">
+              <ul className="space-y-1.5 text-sm leading-relaxed text-text-secondary-700 dark:text-xs dark:text-[#F7F7F7]">
                 {insight.recommended_actions.map((action, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F89D25]"></span>
+                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#F89D25] dark:mt-2 dark:bg-[#F79009]" />
                     <span className="break-words">{action}</span>
                   </li>
                 ))}
@@ -207,16 +230,18 @@ export default function WatchCard({
             </div>
           )}
 
-          {/* INPUTS USED - Figma shows orange background tags */}
+          {/* INPUTS USED - dark: Badge sm Pill color Warning (orange bg, white text) */}
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900 dark:text-[#F7F7F7]">
               INPUTS USED
             </h4>
             <div className="flex flex-wrap gap-2">
               {inputsUsed.map((input, i) => (
                 <span
                   key={i}
-                  className="rounded-full border border-[#F79009] bg-transparent px-3 py-1 text-xs font-medium text-[#9a3412] dark:text-text-warning-dark"
+                  className="rounded-full border px-3 py-1 text-xs font-medium watch-inputs-used-pill bg-transparent text-[#F79009]
+                    dark:bg-[#F79009] dark:px-2.5 dark:py-0.5"
+                  style={{ color: 'var(--watch-inputs-used-text, #F79009)' }}
                 >
                   {input}
                 </span>
@@ -224,10 +249,10 @@ export default function WatchCard({
             </div>
           </div>
 
-          {/* KEY NUMBERS - Color coded values */}
+          {/* KEY NUMBERS - labels same color as footer (var: light quaternary, dark #F7F7F7); values #F79009 */}
           {insight.supporting_numbers.length > 0 && (
             <div>
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-primary-900">
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide watch-card-footer-text" style={{ color: 'var(--watch-footer-text)' }}>
                 KEY NUMBERS
               </h4>
               <div className="flex flex-wrap gap-8">
@@ -235,8 +260,8 @@ export default function WatchCard({
                   const { formatted, colorClass } = formatKeyNumber(num.label, num.value)
                   return (
                     <div key={i}>
-                      <div className="text-xs text-text-quaternary-500">{num.label}</div>
-                      <div className={`text-2xl font-bold ${colorClass}`}>{formatted}</div>
+                      <div className="text-xs watch-card-footer-text" style={{ color: 'var(--watch-footer-text)' }}>{num.label}</div>
+                      <div className={`text-2xl font-bold ${colorClass} dark:text-lg dark:font-semibold`}>{formatted}</div>
                     </div>
                   )
                 })}
@@ -244,11 +269,11 @@ export default function WatchCard({
             </div>
           )}
 
-          {/* Data Notes Warning */}
+          {/* Data Notes Warning - dark mode styling */}
           {insight.data_notes && (
-            <div className="rounded-md bg-[#fef3c7] dark:bg-[#78350f]/20 border border-[#fbbf24] dark:border-[#fbbf24]/40 p-3">
+            <div className="rounded-md bg-[#fef3c7] border border-[#fbbf24] p-3 dark:bg-[#78350f]/20 dark:border-[#742C0C]">
               <div className="flex items-start gap-2">
-                <svg className="h-5 w-5 shrink-0 text-[#d97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 shrink-0 text-[#d97706] dark:text-[#fbbf24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <p className="text-sm text-[#92400e] dark:text-[#fbbf24]">{insight.data_notes}</p>
@@ -256,24 +281,23 @@ export default function WatchCard({
             </div>
           )}
 
-          {/* Footer - Figma 2.11 style with Helpful? label */}
-          <div className="flex items-center justify-between border-t border-border-secondary pt-4 text-xs text-text-quaternary-500">
-            <div className="flex items-center gap-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Footer - Line border from var (dark #742C0C); text color from var (dark #F7F7F7); spacing between "Based on..." and "Updated..." */}
+          <div className="flex h-5 items-center justify-between border-t pt-4 text-xs watch-card-divider-line watch-card-footer-text dark:text-sm" style={{ color: 'var(--watch-footer-text)' }}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>
-                Based on last 90 days
-                {calculatedAt && (
-                  <> • Updated {formatDateWithAt(calculatedAt).toLowerCase()}</>
-                )}
-              </span>
+              <span>Based on last 90 days</span>
+              {calculatedAt && (
+                <span className="ml-3">• Updated {formatDateWithAt(calculatedAt).toLowerCase()}</span>
+              )}
+              <span className="h-1 w-1 rounded-full bg-transparent dark:bg-[#94979C]" aria-hidden />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-text-secondary-700">Helpful?</span>
+              <span style={{ color: 'var(--watch-footer-text)' }}>Helpful?</span>
               <button
                 onClick={() => onFeedback(true)}
-                className="rounded p-1.5 text-text-quaternary-500 hover:text-text-brand-tertiary-600 hover:bg-bg-secondary transition-colors cursor-pointer"
+                className="rounded p-1.5 text-text-quaternary-500 hover:text-text-brand-tertiary-600 hover:bg-bg-secondary transition-colors cursor-pointer dark:hover:bg-[#2a2a2a] dark:hover:text-[#F7F7F7]"
                 title="Yes, helpful"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +306,7 @@ export default function WatchCard({
               </button>
               <button
                 onClick={() => onFeedback(false)}
-                className="rounded p-1.5 text-text-quaternary-500 hover:text-red-500 hover:bg-bg-secondary transition-colors cursor-pointer"
+                className="rounded p-1.5 text-text-quaternary-500 hover:text-red-500 hover:bg-bg-secondary transition-colors cursor-pointer dark:hover:bg-[#2a2a2a] dark:hover:text-red-400"
                 title="Not helpful"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

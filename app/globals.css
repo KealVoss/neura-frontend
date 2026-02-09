@@ -52,6 +52,13 @@
      ============================================ */
   --colors-border-border-primary: #d5d7da;
   --colors-border-border-secondary: #e9eaeb;
+  /* Watch card horizontal dividers: light = #FEF0E7; dark overrides in .dark */
+  --watch-card-divider: #FEF0E7;
+  /* Footer text (Based on last 90 days, Updated..., Helpful?): light = quaternary; dark = #F7F7F7 in .dark */
+  --watch-footer-text: var(--colors-text-text-quaternary-500);
+  /* INPUTS USED pill: light border #FEDF89, text same as "How we worked this out" #F79009; dark overrides in .dark */
+  --watch-inputs-used-border: #FEDF89;
+  --watch-inputs-used-text: #F79009;
 
   /* ============================================
      COLORS - Foreground Colors
@@ -157,12 +164,22 @@
   --colors-background-bg-brand-solid: #0d9488;
   --colors-background-bg-success-secondary: #1a3a2a;
   --colors-background-bg-error-secondary: #3a1a1a;
-  --colors-background-bg-warning-card: #2a1f0f;
+  /* WATCH (Secondary) card - Figma dark mode specs */
+  --colors-background-bg-warning-card: #4E1D09;
   --colors-background-bg-warning-action: #3a2a1a;
   --colors-background-bg-warning-tag: #2a1f0f;
   --colors-background-bg-warning-input: #3a2a1a;
   --colors-background-bg-watch-label: #F79009;
   --colors-background-bg-confidence: #1a1a1a;
+  --watch-card-border: #F79009;
+  --watch-card-divider: #742C0C;
+  --watch-card-shadow: 0px 1px 2px -1px #FDB022;
+  --watch-card-text: #F7F7F7;
+  --watch-card-bullet: #F79009;
+  --watch-card-footer-dot: #94979C;
+  --watch-footer-text: #F7F7F7;
+  --watch-inputs-used-border: #8B340C;
+  --watch-inputs-used-text: #FEC84B;
 
   /* Text Colors - Dark Mode */
   --colors-text-text-primary-900: #ededed;
@@ -176,6 +193,8 @@
   /* Border Colors - Dark Mode */
   --colors-border-border-primary: #2a2a2a;
   --colors-border-border-secondary: #1f1f1f;
+  --colors-border-watch-card: #F79009;
+  --colors-border-watch-divider: #742C0C;
 
   /* Foreground Colors - Dark Mode */
   --colors-foreground-fg-primary-900: #ededed;
@@ -331,6 +350,22 @@ body {
 /* ============================================
    UTILITY CLASSES
    ============================================ */
+
+/* Watch card horizontal lines: light = border-secondary, dark = #742C0C (via .dark --watch-card-divider) */
+.watch-card-divider-line {
+  border-top-color: var(--watch-card-divider);
+}
+
+/* Footer text: light = quaternary, dark = #F7F7F7 (via .dark --watch-footer-text) */
+.watch-card-footer-text {
+  color: var(--watch-footer-text);
+}
+
+/* INPUTS USED pill: border and text from CSS vars (light/dark via .dark) */
+.watch-inputs-used-pill {
+  border-color: var(--watch-inputs-used-border);
+  color: var(--watch-inputs-used-text);
+}
 
 /* Cursor pointer for all interactive elements */
 button,
