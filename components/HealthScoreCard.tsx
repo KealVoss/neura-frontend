@@ -251,63 +251,58 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
 
   return (
     <>
-
-
-      <div className="bg-bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl border border-brand-solid p-6">
+      <div className="bg-bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-xl rounded-br-xl border border-health-score-card-border p-6">
         {/* Header Row - Icon + Title on left, Health Status on right */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* Chart Icon */}
-            <svg className="w-5 h-5 text-text-brand-tertiary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <span className="text-sm font-medium uppercase tracking-wide text-text-secondary-700">
+            <img src="/bus-health-score.svg" alt="" width={24} height={24} className="w-6 h-6 flex-shrink-0" />
+            <span className="text-xs font-medium uppercase tracking-wide text-text-secondary-700">
               BUSINESS HEALTH SCORE
             </span>
           </div>
           {/* Health Status Badge - Right aligned */}
-          <span className={`px-3 py-1 rounded-full text-[13px] font-medium ${grade.badgeClass}`}>
+          <span className={`px-3 py-1 rounded-full text-[14px] font-medium ${grade.badgeClass}`}>
             {grade.label}
           </span>
         </div>
 
         {/* Large Score Display */}
-        <div className="mb-4">
-          <span className={`text-5xl font-bold ${grade.textClass}`}>
+        <div className="">
+          <span className={`font-bold ${grade.textClass}`} style={{ fontSize: '60px' }}>
             {Math.round(scorecard.final_score)}
           </span>
-          <span className="text-xl text-text-quaternary-500 ml-1">/100</span>
+          <span className="text-text-quaternary-500 ml-1" style={{ fontSize: '30px' }}>/100</span>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-text-secondary-700 mb-8">
+        <p className="text-health-score-grade-desc font-medium" style={{ fontSize: '14px' }}>
           {grade.description}
         </p>
 
         {/* Three Metric Boxes - Wrapped in background */}
-        <div className="bg-bg-secondary-subtle dark:bg-bg-secondary rounded-lg p-6 mb-8 flex justify-center gap-12">
+        <div className="rounded-lg p-6 flex justify-center gap-20">
           <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Cash position</div>
+            <div className="text-xs text-health-score-metric mb-1">Cash position</div>
             <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
+              <span className="text-2xl font-semibold text-health-score-metric">
                 {Math.round((cashScore.points_awarded / cashScore.max_points) * 100)}
               </span>
               {getTrendIcon(cashScore.points_awarded, cashScore.max_points)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Revenue</div>
+            <div className="text-xs text-health-score-metric mb-1">Revenue</div>
             <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
+              <span className="text-2xl font-semibold text-health-score-metric">
                 {Math.round((profitabilityScore.points_awarded / profitabilityScore.max_points) * 100)}
               </span>
               {getTrendIcon(profitabilityScore.points_awarded, profitabilityScore.max_points)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-text-quaternary-500 mb-1">Expenses</div>
+            <div className="text-xs text-health-score-metric mb-1">Expenses</div>
             <div className="flex items-center justify-center gap-1">
-              <span className="text-xl font-semibold text-text-primary-900">
+              <span className="text-2xl font-semibold text-health-score-metric">
                 {Math.round((liquidityScore.points_awarded / liquidityScore.max_points) * 100)}
               </span>
               {getTrendIcon(liquidityScore.points_awarded, liquidityScore.max_points)}
@@ -315,19 +310,15 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
           </div>
         </div>
 
-        {/* Runway Summary with Separator */}
-        <div className="border-t border-border-secondary pt-6 mb-2">
-          <p className="text-sm text-text-secondary-700">
-            At your current burn rate, you have approximately {runwayMonths} months of runway remaining.
-          </p>
-        </div>
+        {/* Separator */}
+        <div className="mb-6 h-px shrink-0 bg-[#22262F]" role="presentation" />
 
         {/* Footer */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-xs text-text-quaternary-500">
+          <div className="flex items-center gap-3 text-xs text-health-score-footer-text">
             <span>Updated daily</span>
             {/* Confidence Badge */}
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-secondary text-text-secondary-700">
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-health-score-confidence-border text-health-score-footer-text">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7.74998 3.75V2.25L9.24998 0.75L9.74998 1.75L10.75 2.25L9.24998 3.75H7.74998ZM7.74998 3.75L5.74999 5.74997M10.75 5.75C10.75 8.51142 8.51142 10.75 5.75 10.75C2.98858 10.75 0.75 8.51142 0.75 5.75C0.75 2.98858 2.98858 0.75 5.75 0.75M8.25 5.75C8.25 7.13071 7.13071 8.25 5.75 8.25C4.36929 8.25 3.25 7.13071 3.25 5.75C3.25 4.36929 4.36929 3.25 5.75 3.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -336,7 +327,7 @@ export default function HealthScoreCard({ data, isLoading, onRefresh }: HealthSc
           </div>
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-1 px-4 py-2 bg-bg-brand-solid text-text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium cursor-pointer"
+            className="flex items-center gap-1 px-4 py-2 bg-bg-brand-solid font-bold text-text-white rounded-xl hover:opacity-90 transition-opacity text-sm cursor-pointer"
           >
             View details
             <svg className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-90' : ''}`} viewBox="0 0 20 20" fill="currentColor">

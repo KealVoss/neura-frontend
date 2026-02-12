@@ -5,7 +5,7 @@ import { Skeleton } from './Skeleton'
 export function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-bg-primary">
-      <div className="mx-auto max-w-[1280px] px-4 py-6 md:px-8 md:py-6">
+      <div className="mx-auto max-w-[800px] px-4 py-6 md:px-8 md:py-6">
         {/* Header Skeleton */}
         <div className="mb-8">
           <Skeleton className="mb-3 h-9 w-64 rounded-lg" />

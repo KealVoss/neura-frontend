@@ -43,12 +43,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border-secondary bg-bg-primary">
+    <nav className="sticky top-0 z-50 w-full border-b border-border-secondary bg-nav-header-bg">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-4 md:px-8 md:py-4">
         {/* Left Side - Logo */}
         <Link href="/overview" className="flex items-center gap-3">
           <img
-            src="/logo.svg"
+            src="/Logomark.svg"
             alt="Neura"
             width={38}
             height={38}
@@ -97,87 +97,40 @@ export default function Navbar() {
         </div>
 
         {/* Desktop - Right Side Icons */}
-        <div className="hidden items-center gap-4 md:flex">
-          {/* Dark/Light Mode Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="flex h-10 w-10 items-center justify-center rounded-md text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer"
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {theme === 'light' ? (
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            )}
-          </button>
+        <div className="hidden items-center gap-md md:flex text-nav-icon">
+          <div className="flex items-center">
+            {/* Dark/Light Mode Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-white/10 cursor-pointer"
+              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              <img src="/moon-02.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)]" />
+            </button>
+
+            {/* Settings */}
+            <Link
+              href="/settings"
+              className="flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-white/10 cursor-pointer"
+              aria-label="Settings"
+            >
+              <img src="/settings-icon.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)]" />
+            </Link>
+          </div>
 
           {/* User Profile Icon with Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border-secondary bg-bg-primary text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border-secondary bg-nav-avatar-bg transition-colors hover:bg-white/10 cursor-pointer"
               aria-label="User menu"
             >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
+              <img src="/avatar.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)] object-contain" />
             </button>
 
             {/* User Dropdown Menu */}
             {userDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border-secondary bg-bg-primary shadow-lg py-1 z-50">
-                {/* Settings */}
-                <button
-                  onClick={() => {
-                    router.push('/settings')
-                    setUserDropdownOpen(false)
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-text-primary-900 hover:bg-bg-secondary transition-colors"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Settings
-                </button>
-
                 {/* Admin - only for admins */}
                 {isAdmin && (
                   <button
@@ -218,7 +171,7 @@ export default function Navbar() {
         {/* Mobile - Hamburger Menu */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-md text-text-primary-900 transition-colors hover:bg-bg-secondary cursor-pointer md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-nav-icon transition-colors hover:bg-white/10 cursor-pointer md:hidden"
           aria-label="Menu"
         >
           {mobileMenuOpen ? (
@@ -260,7 +213,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-border-secondary bg-bg-primary md:hidden">
+        <div className="border-t border-border-secondary bg-nav-header-bg md:hidden">
           <div className="mx-auto max-w-[1280px] px-4 py-2">
             {/* Navigation Links */}
             <Link
@@ -305,94 +258,36 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Dark/Light Mode Toggle */}
-            <button
-              onClick={handleThemeToggle}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
-            >
-              {theme === 'light' ? (
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              )}
-              <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
-            </button>
+            <div className="gap-lg">
 
-            {/* Settings */}
-            <button
-              onClick={handleSettingsClick}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span>Settings</span>
-            </button>
+              <div className="">
+                {/* Dark/Light Mode Toggle */}
+                <button
+                  onClick={handleThemeToggle}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
+                >
+                  <img src="/moon-02.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)] flex-shrink-0" />
+                  <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+                </button>
 
-            {/* User Profile */}
-            <button
-              onClick={handleProfileClick}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+                {/* Settings */}
+                <button
+                  onClick={handleSettingsClick}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
+                >
+                  <img src="/settings-icon.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)] flex-shrink-0" />
+                  <span>Settings</span>
+                </button>
+              </div>
+              {/* User Profile */}
+              <button
+                onClick={handleProfileClick}
+                className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-text-primary-900 transition-colors hover:bg-bg-secondary"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              <span>Profile</span>
-            </button>
+                <img src="/avatar.svg" alt="" width={16.63} height={16.63} className="size-[var(--size-nav-icon)] flex-shrink-0 object-contain" />
+                <span>Profile</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

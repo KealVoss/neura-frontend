@@ -82,6 +82,24 @@
   --component-colors-components-icons-featured-icon-light-fg-error: #d92d20;
 
   /* ============================================
+     NAV / HEADER - Custom colors and sizes
+     ============================================ */
+  --colors-nav-header-bg: #22262F;
+  --colors-nav-icon: #61656C;
+  --colors-nav-avatar-bg: #13161B;
+  --size-nav-icon: 16.63px;
+
+  /* Health score card - three metric boxes */
+  --colors-health-score-grade-desc: #94979C;
+  --colors-health-score-metric: #F7F7F7;
+  /* Health score card - footer labels (Updated daily, confidence) */
+  --colors-health-score-footer-text: #CECFD2;
+  /* Health score card - confidence badge border */
+  --colors-health-score-confidence-border: #373A41;
+  /* Health score card - card border */
+  --colors-health-score-card-border: #17B26A;
+
+  /* ============================================
      SPACING - Semantic Spacing Tokens
      ============================================ */
   --spacing-xxs: 2px;
@@ -157,8 +175,8 @@
    ============================================ */
 .dark {
   /* Background Colors - Dark Mode */
-  --colors-background-bg-primary: #171717;
-  --colors-background-bg-primary-alt: #171717;
+  --colors-background-bg-primary: #13161B;
+  --colors-background-bg-primary-alt: #13161B;
   --colors-background-bg-secondary: #1f1f1f;
   --colors-background-bg-secondary-subtle: #262626;
   --colors-background-bg-brand-solid: #0d9488;
@@ -268,6 +286,19 @@
   /* Icon Colors */
   --color-icon-success: var(--component-colors-components-icons-featured-icon-light-fg-success);
   --color-icon-error: var(--component-colors-components-icons-featured-icon-light-fg-error);
+  
+  /* Nav / Header */
+  --color-nav-header-bg: var(--colors-nav-header-bg);
+  --color-nav-icon: var(--colors-nav-icon);
+  --color-nav-avatar-bg: var(--colors-nav-avatar-bg);
+  --size-nav-icon: var(--size-nav-icon);
+  
+  /* Health score card */
+  --color-health-score-metric: var(--colors-health-score-metric);
+  --color-health-score-footer-text: var(--colors-health-score-footer-text);
+  --color-health-score-confidence-border: var(--colors-health-score-confidence-border);
+  --color-health-score-grade-desc: var(--colors-health-score-grade-desc);
+  --color-health-score-card-border: var(--colors-health-score-card-border);
   
   /* Fonts */
   --font-sans: var(--font-family-body);

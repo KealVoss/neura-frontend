@@ -49,7 +49,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-bg-primary">
       <Navbar />
       {/* Main Content */}
-      <main className="mx-auto max-w-[1280px] px-4 py-6 md:px-8 md:py-6">
+      <main className="mx-auto max-w-content px-4 py-6 md:px-8 md:py-6">
         {children}
       </main>
     </div>

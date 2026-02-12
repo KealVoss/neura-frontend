@@ -300,7 +300,7 @@ export default function OverviewPage() {
   const hasNoInsights = !data || data.insights.length === 0
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-bg-primary max-w-[800px] mx-auto py-6">
       <div className="mx-auto max-w-[1280px] px-4 py-6 md:px-8 md:py-6">
         {/* Header */}
         <div className="mb-8">

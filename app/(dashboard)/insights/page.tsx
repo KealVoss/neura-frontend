@@ -123,7 +123,7 @@ export default function InsightsPage() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <div className="mx-auto max-w-[1280px] px-4 py-6 md:px-8 md:py-6">
+      <div className="mx-auto max-w-[800px] py-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
